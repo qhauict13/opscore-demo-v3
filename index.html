@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OPSCORE — Kiểm soát vận hành thương mại điện tử</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --nav:#132639; --nav-hi:#1E3A55; --nav-txt:#9FB6CC; --nav-txt2:#6E88A2;
+  --paper:#F4F4F1; --card:#FFFFFF;
+  --ink:#15171B; --ink2:#4B505A; --ink3:#858A93;
+  --line:#E2E0DA; --line2:#EEECE6;
+  --steel:#1B3A5F; --steel-soft:#EBF0F6; --steel2:#2A5075;
+  --red:#B3261E; --red-soft:#FBEDEC; --red-line:#E9BEBA;
+  --grn:#25694A; --grn-soft:#E8F2EC; --grn-line:#BBD9C8;
+  --amb:#8A6100; --amb-soft:#FBF2DD; --amb-line:#E6D19C;
+  --sh1:0 1px 2px rgba(21,23,27,.06);
+  --sh2:0 2px 4px rgba(21,23,27,.05), 0 12px 28px -14px rgba(21,23,27,.28);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%}
+body{background:var(--paper);color:var(--ink);font-family:Inter,system-ui,-apple-system,sans-serif;font-size:13.5px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow:hidden}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+button,input,select,textarea{font-family:inherit;font-size:inherit}
+button{cursor:pointer}
+a{color:var(--steel)}
+:focus-visible{outline:2px solid var(--steel);outline-offset:1px;border-radius:3px}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:#CFCDC6;border-radius:6px;border:3px solid var(--paper)}
+::-webkit-scrollbar-track{background:transparent}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+@media(max-width:820px){
+  body{overflow:auto}
+  .app{grid-template-columns:1fr;height:auto}
+  .nav{flex-direction:row;overflow-x:auto;overflow-y:hidden;align-items:center;gap:2px;padding:0 8px;position:sticky;top:0;z-index:40}
+  .nav .logo,.nav .navfoot{border:0;flex:none}
+  .nav .tenantbox{border:0;flex:none;padding:8px}
+  .nav .tenantbox label{display:none}
+  .navgrp{display:flex;align-items:center;padding:0}
+  .navgrp h6{display:none}
+  .navitem{white-space:nowrap;border-left:0;border-bottom:2.5px solid transparent;padding:9px 11px}
+  .navitem.on{border-left:0;border-bottom-color:#5B94CC}
+  .hdr{height:auto;padding:9px 14px;flex-wrap:wrap}
+  .search input{width:150px}
+  .body{padding:14px}
+  .cal{grid-template-columns:repeat(10,1fr)}
+  .rung{grid-template-columns:1fr 96px;gap:8px}
+  .rung .rbar,.rung .rp{display:none}
+  table{font-size:12.5px}
+  .card{overflow-x:auto}
+}
+
+/* ============ KHUNG ============ */
+.app{display:grid;grid-template-columns:230px 1fr;height:100vh}
+.nav{background:var(--nav);color:#fff;display:flex;flex-direction:column;overflow-y:auto}
+.nav::-webkit-scrollbar-thumb{background:#2A4462;border-color:var(--nav)}
+.logo{display:flex;align-items:center;gap:10px;padding:15px 17px 13px;border-bottom:1px solid rgba(255,255,255,.09)}
+.logo .mark{width:28px;height:28px;border-radius:6px;background:linear-gradient(140deg,#3C6C9E,#1B3A5F);display:grid;place-items:center;font-weight:700;font-size:13px;color:#fff;flex:none}
+.logo b{font-size:15px;font-weight:700;letter-spacing:-.02em;display:block;line-height:1.1}
+.logo em{font-style:normal;font-size:9.5px;letter-spacing:.13em;color:var(--nav-txt2);text-transform:uppercase}
+
+.tenantbox{padding:11px 13px;border-bottom:1px solid rgba(255,255,255,.09)}
+.tenantbox label{display:block;font-size:10px;color:var(--nav-txt2);margin-bottom:5px;letter-spacing:.04em}
+.tenantbox select{width:100%;background:var(--nav-hi);color:#fff;border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:6px 8px;font-size:12.5px;font-weight:500}
+.tenantbox select option{background:#1B3A5F}
+
+.navgrp{padding:12px 0 2px}
+.navgrp h6{margin:0 0 5px;padding:0 17px;font-size:9.5px;font-weight:600;letter-spacing:.11em;color:var(--nav-txt2);text-transform:uppercase}
+.navitem{display:flex;align-items:center;gap:9px;width:100%;background:none;border:0;color:var(--nav-txt);padding:7px 17px;text-align:left;font-size:13px;border-left:2.5px solid transparent}
+.navitem:hover{background:rgba(255,255,255,.05);color:#E4EDF5}
+.navitem.on{background:var(--nav-hi);color:#fff;border-left-color:#5B94CC;font-weight:600}
+.navitem .ic{width:15px;flex:none;opacity:.85}
+.navitem .bdg{margin-left:auto;font-size:10.5px;font-weight:600;padding:1px 6px;border-radius:9px;background:rgba(255,255,255,.13);color:#D6E4F0}
+.navitem .bdg.hot{background:#7E2A24;color:#FFD9D5}
+.navitem .bdg.new{background:#1F5B41;color:#B7EBD1}
+.navfoot{margin-top:auto;padding:12px 17px;border-top:1px solid rgba(255,255,255,.09);font-size:11px;color:var(--nav-txt2)}
+.navfoot b{color:#C6D8E8;font-weight:600;display:block;font-size:12px}
+
+.main{display:flex;flex-direction:column;overflow:hidden}
+.hdr{display:flex;align-items:center;gap:14px;padding:0 22px;height:52px;background:var(--card);border-bottom:1px solid var(--line);flex:none}
+.hdr h1{margin:0;font-size:15.5px;font-weight:600;letter-spacing:-.01em}
+.hdr .sub{font-size:12px;color:var(--ink3)}
+.hdr .sp{margin-left:auto;display:flex;align-items:center;gap:9px}
+.demoflag{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#7A5400;background:var(--amb-soft);border:1px solid var(--amb-line);padding:2px 9px;border-radius:20px;white-space:nowrap}
+.search{position:relative}
+.search input{width:230px;padding:6px 10px 6px 28px;border:1px solid var(--line);border-radius:7px;background:var(--paper)}
+.search span{position:absolute;left:9px;top:6px;color:var(--ink3);font-size:12px}
+.body{flex:1;overflow-y:auto;padding:19px 22px 40px}
+
+/* ============ NGUYÊN TỬ ============ */
+.btn{border:1px solid var(--line);background:var(--card);border-radius:7px;padding:6px 12px;font-weight:500;color:var(--ink2)}
+.btn:hover{background:var(--paper);border-color:#CFCCC4}
+.btn.pri{background:var(--steel);border-color:var(--steel);color:#fff}
+.btn.pri:hover{background:#16324F}
+.btn.dgr{background:var(--red);border-color:var(--red);color:#fff}
+.btn.sm{padding:4px 9px;font-size:12px;border-radius:6px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:var(--sh1)}
+.card>h3{margin:0;padding:12px 15px;font-size:13.5px;font-weight:600;border-bottom:1px solid var(--line2);display:flex;align-items:center;gap:9px}
+.card>h3 .r{margin-left:auto;font-weight:400;font-size:12px;color:var(--ink3)}
+.card .pad{padding:15px}
+
+.grid{display:grid;gap:13px}
+.g4{grid-template-columns:repeat(4,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:1180px){.g4{grid-template-columns:repeat(2,1fr)}.g3,.g2{grid-template-columns:1fr}}
+
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:13px 15px;box-shadow:var(--sh1)}
+.kpi .lb{font-size:11.5px;color:var(--ink3);margin-bottom:5px}
+.kpi .vl{font-size:23px;font-weight:600;letter-spacing:-.02em;line-height:1.15}
+.kpi .dt{font-size:11.5px;color:var(--ink3);margin-top:4px}
+.kpi.al{border-color:var(--red-line);background:var(--red-soft)}
+.kpi.al .vl{color:var(--red)}
+.kpi.ok .vl{color:var(--grn)}
+
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:11.5px;font-weight:600;color:var(--ink3);padding:8px 11px;border-bottom:1px solid var(--line);white-space:nowrap;background:#FAFAF8}
+td{padding:9px 11px;border-bottom:1px solid var(--line2);vertical-align:top}
+tr:last-child td{border-bottom:0}
+.tr-click{cursor:pointer}
+.tr-click:hover{background:#FAFAF8}
+.num{text-align:right;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;white-space:nowrap}
+
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:1.5px 7px;border-radius:20px;border:1px solid;white-space:nowrap}
+.c-red{background:var(--red-soft);border-color:var(--red-line);color:var(--red)}
+.c-grn{background:var(--grn-soft);border-color:var(--grn-line);color:var(--grn)}
+.c-amb{background:var(--amb-soft);border-color:var(--amb-line);color:var(--amb)}
+.c-stl{background:var(--steel-soft);border-color:#C6D5E4;color:var(--steel)}
+.c-gry{background:#F1F0EC;border-color:var(--line);color:var(--ink2)}
+.dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex:none}
+
+.tabs{display:flex;gap:3px;border-bottom:1px solid var(--line);margin-bottom:15px}
+.tabs button{background:none;border:0;border-bottom:2px solid transparent;padding:7px 13px;color:var(--ink2);font-weight:500;margin-bottom:-1px}
+.tabs button.on{color:var(--steel);border-bottom-color:var(--steel);font-weight:600}
+.tabs button:hover{color:var(--ink)}
+
+.pills{display:flex;gap:6px;flex-wrap:wrap}
+.pills button{border:1px solid var(--line);background:var(--card);border-radius:20px;padding:4px 11px;font-size:12.5px;color:var(--ink2)}
+.pills button.on{background:var(--steel);border-color:var(--steel);color:#fff;font-weight:500}
+
+.note{background:var(--amb-soft);border:1px solid var(--amb-line);border-radius:8px;padding:10px 13px;font-size:12.5px;color:#5E4300;display:flex;gap:9px;align-items:flex-start}
+.note b{color:#3F2D00}
+.note.stl{background:var(--steel-soft);border-color:#C6D5E4;color:#1B3A5F}
+.note.stl b{color:#12293F}
+
+.empty{text-align:center;padding:46px 20px;color:var(--ink3)}
+.empty b{display:block;color:var(--ink2);font-size:14px;margin-bottom:5px;font-weight:600}
+
+.bar{height:7px;border-radius:4px;background:var(--line2);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--steel)}
+
+.modal-bg{position:fixed;inset:0;background:rgba(19,38,57,.42);display:grid;place-items:center;z-index:80;padding:22px}
+.modal{background:var(--card);border-radius:12px;box-shadow:var(--sh2);width:100%;max-width:520px;max-height:86vh;overflow:auto}
+.modal h3{margin:0;padding:14px 18px;border-bottom:1px solid var(--line2);font-size:15px}
+.modal .mp{padding:18px}
+.modal .mf{padding:12px 18px;border-top:1px solid var(--line2);display:flex;gap:8px;justify-content:flex-end;background:#FAFAF8;border-radius:0 0 12px 12px}
+.fld{margin-bottom:13px}
+.fld label{display:block;font-size:12px;font-weight:500;color:var(--ink2);margin-bottom:4px}
+.fld input,.fld select,.fld textarea{width:100%;padding:7px 9px;border:1px solid var(--line);border-radius:7px;background:var(--card)}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--nav);color:#fff;padding:10px 17px;border-radius:9px;box-shadow:var(--sh2);z-index:90;font-size:13px}
+
+/* ============ THANG BIÊN LỢI NHUẬN (module mới) ============ */
+.ladder{display:flex;flex-direction:column;gap:0}
+.rung{display:grid;grid-template-columns:170px 1fr 132px 74px;gap:13px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line2)}
+.rung:last-child{border-bottom:0}
+.rung .rl{font-size:13px;font-weight:600}
+.rung .rl small{display:block;font-weight:400;font-size:11px;color:var(--ink3);margin-top:1px}
+.rung .rbar{position:relative;height:26px;background:#F5F4F0;border-radius:5px;overflow:hidden}
+.rung .rbar i{position:absolute;left:0;top:0;bottom:0;background:var(--steel);border-radius:5px}
+.rung .rbar i.neg{background:var(--red)}
+.rung .rv{text-align:right;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;font-size:14px;font-weight:600}
+.rung .rp{text-align:right;font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink3)}
+.rung.ded{padding:5px 0}
+.rung.ded .rl{font-weight:400;font-size:12.5px;color:var(--ink2);padding-left:15px;position:relative}
+.rung.ded .rl:before{content:"";position:absolute;left:4px;top:8px;width:6px;height:1px;background:var(--ink3)}
+.rung.ded .rv{font-weight:400;font-size:12.5px;color:var(--ink2)}
+.rung.ded .rbar{height:12px;background:transparent}
+.rung.ded .rbar i{background:#D8D4CB;border-radius:3px}
+.rung.ded .rbar i.plus{background:var(--grn-line)}
+.rung.tot{background:#FAFAF8;margin:0 -15px;padding:11px 15px;border-top:1.5px solid var(--line);border-bottom:1.5px solid var(--line)}
+
+.q{display:inline-block;width:7px;height:7px;border-radius:2px;margin-right:5px;vertical-align:middle;flex:none}
+.q-r{background:var(--grn)}
+.q-e{background:var(--amb)}
+.q-n{background:#C9C5BB}
+.qlegend{display:flex;gap:15px;font-size:11.5px;color:var(--ink3);align-items:center;flex-wrap:wrap}
+
+/* ============ DỰ BÁO (module mới) ============ */
+.cal{display:grid;grid-template-columns:repeat(15,1fr);gap:3px}
+.cal .d{display:flex;flex-direction:column;justify-content:flex-end;height:150px;position:relative}
+.cal .d .st{width:100%;border-radius:2px 2px 0 0}
+.cal .d .s1{background:var(--steel)}
+.cal .d .s2{background:#7FA3C4}
+.cal .d .s3{background:var(--amb-line)}
+.cal .d .lb{font-size:9.5px;color:var(--ink3);text-align:center;margin-top:4px;font-family:"IBM Plex Mono",monospace}
+.cal .d:hover .st{filter:brightness(1.12)}
+.cal .d .tip{display:none;position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:var(--nav);color:#fff;padding:7px 10px;border-radius:7px;font-size:11.5px;white-space:nowrap;z-index:9;margin-bottom:5px;box-shadow:var(--sh2)}
+.cal .d:hover .tip{display:block}
+
+.sim{display:grid;grid-template-columns:290px 1fr;gap:16px}
+@media(max-width:1080px){.sim{grid-template-columns:1fr}}
+.simc{background:#FAFAF8;border:1px solid var(--line);border-radius:9px;padding:14px}
+.simc h4{margin:0 0 12px;font-size:12.5px;font-weight:600;color:var(--ink2)}
+.rng{display:flex;align-items:center;gap:9px;margin-bottom:11px}
+.rng label{font-size:12px;flex:none;width:104px;color:var(--ink2)}
+.rng input[type=range]{flex:1;accent-color:var(--steel)}
+.rng .v{width:46px;text-align:right;font-family:"IBM Plex Mono",monospace;font-size:12.5px;font-weight:600}
+.tog{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-top:1px solid var(--line2)}
+.tog span{font-size:12.5px}
+.tog small{display:block;color:var(--ink3);font-size:11px}
+.sw{width:36px;height:20px;border-radius:12px;background:#D3CFC6;border:0;position:relative;flex:none;transition:background .15s}
+.sw:after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:left .15s}
+.sw.on{background:var(--steel)}
+.sw.on:after{left:18px}
+
+.bt{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.bt .c{border:1px solid var(--line);border-radius:8px;padding:9px 10px;background:var(--card)}
+.bt .c .p{font-size:11px;color:var(--ink3)}
+.bt .c .e{font-size:16px;font-weight:600;font-family:"IBM Plex Mono",monospace;margin-top:3px}
+.bt .c.good .e{color:var(--grn)}
+.bt .c.bad .e{color:var(--red)}
+@media(max-width:1080px){.bt{grid-template-columns:repeat(3,1fr)}}
+
+.spark{display:flex;align-items:flex-end;gap:2px;height:38px}
+.spark i{flex:1;background:var(--steel-soft);border-radius:1px 1px 0 0;min-height:2px}
+.spark i.hi{background:var(--steel)}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ==================== DỮ LIỆU MÔ PHỎNG ====================
+   Toàn bộ số liệu dưới đây được dựng để minh hoạ sản phẩm.
+   Không phải số đo thật trên hệ thống của bất kỳ khách hàng nào. */
+
+const KY = "Tháng 8/2026";
+
+/* --- tiện ích --- */
+const T = 1e6; // triệu
+function vnd(n,d){ if(n===null||n===undefined) return "—";
+  const s = n<0?"-":""; const a=Math.abs(n);
+  if(a>=1e9) return s+(a/1e9).toFixed(d===undefined?2:d)+" tỷ";
+  if(a>=1e6) return s+Math.round(a/1e6).toLocaleString("vi-VN")+" tr";
+  return s+Math.round(a).toLocaleString("vi-VN");
+}
+function pc(n,t){ if(!t) return "—"; return (n/t*100).toFixed(1)+"%"; }
+function kd(s){ return s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/đ/g,"d").replace(/Đ/g,"D").toLowerCase(); }
+
+/* --- khách hàng --- */
+const TENANTS = [
+  {id:"cocoon", ten:"Cocoon Việt Nam", nganh:"Mỹ phẩm", erp:"Odoo 19", oms:"Odoo OMS", golive:"03/2026", covMap:92},
+  {id:"vitalux", ten:"Vitalux Nutrition", nganh:"Thực phẩm bổ sung", erp:"Odoo 17", oms:"Odoo OMS", golive:"05/2026", covMap:78},
+  {id:"anzen", ten:"Anzen Home", nganh:"Gia dụng", erp:"SAP B1", oms:"Magento + OMS ngoài", golive:"06/2026", covMap:64},
+  {id:"mekong", ten:"Mekong Foods", nganh:"Thực phẩm", erp:"Odoo 19", oms:"Odoo OMS", golive:"07/2026", covMap:71},
+  {id:"bloomia", ten:"Bloomia Beauty", nganh:"Mỹ phẩm", erp:"Magento + Bravo", oms:"Chưa có", golive:"Đang triển khai", covMap:41}
+];
+
+/* --- P&L theo kênh: số gốc, mọi tầng đều tính từ đây --- */
+/* q: chất lượng dữ liệu — r = đã đối soát, e = ước tính, n = chưa có */
+const PNL = {
+ cocoon:{
+  ky:KY, chungChua:{brand:680*T, gna:420*T},
+  kenh:[
+   {k:"web", ten:"Website", loai:"Sở hữu", gmv:3180*T, kmBan:286*T, kmSan:0, hoan:76*T, cogs:902*T,
+    hh:0, ttoan:31*T, dvu:0, xtra:0, ship:168*T, thue:0,
+    ads:214*T, aff:0, dgoi:42*T, kho:68*T, ns:55*T, ht:22*T,
+    q:{cogs:"r", kmSan:"r", ads:"r", aff:"r", dgoi:"e", kho:"e", ns:"e", ht:"e"}},
+   {k:"shopee", ten:"Shopee", loai:"Sàn", gmv:8640*T, kmBan:1037*T, kmSan:214*T, hoan:502*T, cogs:2414*T,
+    hh:402*T, ttoan:293*T, dvu:88*T, xtra:621*T, ship:186*T, thue:73*T,
+    ads:918*T, aff:142*T, dgoi:118*T, kho:196*T, ns:148*T, ht:44*T,
+    q:{cogs:"r", kmSan:"r", ads:"r", aff:"r", dgoi:"e", kho:"e", ns:"e", ht:"e"}},
+   {k:"tiktok", ten:"TikTok Shop", loai:"Sàn", gmv:5420*T, kmBan:812*T, kmSan:168*T, hoan:758*T, cogs:1366*T,
+    hh:172*T, ttoan:201*T, dvu:54*T, xtra:288*T, ship:214*T, thue:40*T,
+    ads:806*T, aff:918*T, dgoi:96*T, kho:142*T, ns:186*T, ht:34*T,
+    q:{cogs:"r", kmSan:"e", ads:"r", aff:"r", dgoi:"e", kho:"e", ns:"e", ht:"e"}},
+   {k:"lazada", ten:"Lazada", loai:"Sàn", gmv:2140*T, kmBan:235*T, kmSan:62*T, hoan:118*T, cogs:610*T,
+    hh:96*T, ttoan:74*T, dvu:22*T, xtra:143*T, ship:51*T, thue:18*T,
+    ads:218*T, aff:31*T, dgoi:28*T, kho:48*T, ns:42*T, ht:16*T,
+    q:{cogs:"r", kmSan:"e", ads:"r", aff:"r", dgoi:"e", kho:"e", ns:"e", ht:"e"}},
+   {k:"gtmt", ten:"GT / MT", loai:"Ngoại tuyến", gmv:4260*T, kmBan:383*T, kmSan:0, hoan:64*T, cogs:1373*T,
+    hh:458*T, ttoan:0, dvu:0, xtra:0, ship:142*T, thue:0,
+    ads:186*T, aff:0, dgoi:52*T, kho:124*T, ns:96*T, ht:18*T,
+    q:{cogs:"r", kmSan:"r", ads:"e", aff:"r", dgoi:"e", kho:"e", ns:"e", ht:"e"}}
+  ]},
+ vitalux:{
+  ky:KY, chungChua:{brand:310*T, gna:240*T},
+  kenh:[
+   {k:"web", ten:"Website", loai:"Sở hữu", gmv:1240*T, kmBan:96*T, kmSan:0, hoan:24*T, cogs:402*T,
+    hh:0, ttoan:12*T, dvu:0, xtra:0, ship:66*T, thue:0, ads:98*T, aff:0, dgoi:16*T, kho:26*T, ns:22*T, ht:9*T,
+    q:{cogs:"e", kmSan:"r", ads:"r", aff:"r", dgoi:"e", kho:"e", ns:"e", ht:"e"}},
+   {k:"shopee", ten:"Shopee", loai:"Sàn", gmv:4180*T, kmBan:522*T, kmSan:104*T, hoan:238*T, cogs:1264*T,
+    hh:196*T, ttoan:142*T, dvu:42*T, xtra:318*T, ship:92*T, thue:36*T,
+    ads:486*T, aff:64*T, dgoi:56*T, kho:88*T, ns:72*T, ht:21*T,
+    q:{cogs:"e", kmSan:"r", ads:"r", aff:"r", dgoi:"e", kho:"e", ns:"e", ht:"e"}},
+   {k:"tiktok", ten:"TikTok Shop", loai:"Sàn", gmv:3060*T, kmBan:498*T, kmSan:88*T, hoan:436*T, cogs:812*T,
+    hh:98*T, ttoan:114*T, dvu:31*T, xtra:164*T, ship:126*T, thue:23*T,
+    ads:428*T, aff:512*T, dgoi:54*T, kho:78*T, ns:104*T, ht:19*T,
+    q:{cogs:"e", kmSan:"e", ads:"r", aff:"r", dgoi:"e", kho:"e", ns:"e", ht:"e"}},
+   {k:"lazada", ten:"Lazada", loai:"Sàn", gmv:960*T, kmBan:104*T, kmSan:26*T, hoan:52*T, cogs:288*T,
+    hh:43*T, ttoan:33*T, dvu:10*T, xtra:62*T, ship:24*T, thue:8*T,
+    ads:92*T, aff:14*T, dgoi:13*T, kho:21*T, ns:19*T, ht:7*T,
+    q:{cogs:"e", kmSan:"e", ads:"r", aff:"r", dgoi:"e", kho:"e", ns:"e", ht:"e"}}
+  ]},
+ anzen:{
+  ky:KY, chungChua:{brand:420*T, gna:290*T},
+  kenh:[
+   {k:"web", ten:"Website", loai:"Sở hữu", gmv:2260*T, kmBan:158*T, kmSan:0, hoan:44*T, cogs:1128*T,
+    hh:0, ttoan:23*T, dvu:0, xtra:0, ship:196*T, thue:0, ads:184*T, aff:0, dgoi:38*T, kho:62*T, ns:48*T, ht:17*T,
+    q:{cogs:"n", kmSan:"r", ads:"r", aff:"r", dgoi:"e", kho:"e", ns:"e", ht:"e"}},
+   {k:"shopee", ten:"Shopee", loai:"Sàn", gmv:5340*T, kmBan:641*T, kmSan:132*T, hoan:374*T, cogs:2664*T,
+    hh:246*T, ttoan:182*T, dvu:54*T, xtra:392*T, ship:298*T, thue:44*T,
+    ads:534*T, aff:88*T, dgoi:124*T, kho:186*T, ns:132*T, ht:38*T,
+    q:{cogs:"n", kmSan:"r", ads:"r", aff:"r", dgoi:"e", kho:"e", ns:"e", ht:"e"}},
+   {k:"tiktok", ten:"TikTok Shop", loai:"Sàn", gmv:1820*T, kmBan:273*T, kmSan:54*T, hoan:246*T, cogs:892*T,
+    hh:62*T, ttoan:66*T, dvu:18*T, xtra:96*T, ship:142*T, thue:12*T,
+    ads:218*T, aff:246*T, dgoi:44*T, kho:64*T, ns:72*T, ht:14*T,
+    q:{cogs:"n", kmSan:"e", ads:"r", aff:"r", dgoi:"e", kho:"e", ns:"e", ht:"e"}}
+  ]},
+ mekong:{
+  ky:KY, chungChua:{brand:180*T, gna:210*T},
+  kenh:[
+   {k:"web", ten:"Website", loai:"Sở hữu", gmv:640*T, kmBan:44*T, kmSan:0, hoan:14*T, cogs:298*T,
+    hh:0, ttoan:6*T, dvu:0, xtra:0, ship:52*T, thue:0, ads:48*T, aff:0, dgoi:12*T, kho:18*T, ns:16*T, ht:6*T,
+    q:{cogs:"e", kmSan:"r", ads:"r", aff:"r", dgoi:"e", kho:"e", ns:"e", ht:"e"}},
+   {k:"shopee", ten:"Shopee", loai:"Sàn", gmv:2180*T, kmBan:262*T, kmSan:58*T, hoan:142*T, cogs:1024*T,
+    hh:102*T, ttoan:74*T, dvu:22*T, xtra:164*T, ship:148*T, thue:18*T,
+    ads:218*T, aff:34*T, dgoi:62*T, kho:94*T, ns:64*T, ht:18*T,
+    q:{cogs:"e", kmSan:"r", ads:"r", aff:"r", dgoi:"e", kho:"e", ns:"e", ht:"e"}},
+   {k:"gtmt", ten:"GT / MT", loai:"Ngoại tuyến", gmv:6420*T, kmBan:578*T, kmSan:0, hoan:96*T, cogs:2984*T,
+    hh:706*T, ttoan:0, dvu:0, xtra:0, ship:214*T, thue:0, ads:268*T, aff:0, dgoi:78*T, kho:186*T, ns:148*T, ht:24*T,
+    q:{cogs:"e", kmSan:"r", ads:"e", aff:"r", dgoi:"e", kho:"e", ns:"e", ht:"e"}}
+  ]},
+ bloomia:{
+  ky:KY, chungChua:{brand:240*T, gna:160*T},
+  kenh:[
+   {k:"shopee", ten:"Shopee", loai:"Sàn", gmv:1860*T, kmBan:242*T, kmSan:44*T, hoan:118*T, cogs:0,
+    hh:86*T, ttoan:64*T, dvu:19*T, xtra:138*T, ship:48*T, thue:16*T,
+    ads:224*T, aff:38*T, dgoi:0, kho:0, ns:0, ht:0,
+    q:{cogs:"n", kmSan:"e", ads:"r", aff:"r", dgoi:"n", kho:"n", ns:"n", ht:"n"}},
+   {k:"tiktok", ten:"TikTok Shop", loai:"Sàn", gmv:2240*T, kmBan:358*T, kmSan:72*T, hoan:314*T, cogs:0,
+    hh:71*T, ttoan:84*T, dvu:22*T, xtra:118*T, ship:96*T, thue:17*T,
+    ads:326*T, aff:398*T, dgoi:0, kho:0, ns:0, ht:0,
+    q:{cogs:"n", kmSan:"e", ads:"r", aff:"r", dgoi:"n", kho:"n", ns:"n", ht:"n"}}
+  ]}
+};
+
+/* --- tính các tầng biên lợi nhuận từ số gốc --- */
+function tinhPNL(c){
+  const dtt   = c.gmv - c.kmBan - c.hoan + c.kmSan;
+  const lgop  = dtt - c.cogs;
+  const phi1  = c.hh + c.ttoan + c.dvu + c.xtra + c.ship + c.thue;
+  const cm1   = lgop - phi1;
+  const phi2  = c.ads + c.aff + c.dgoi;
+  const cm2   = cm1 - phi2;
+  const phi3  = c.kho + c.ns + c.ht;
+  const cm3   = cm2 - phi3;
+  return {...c, dtt, lgop, phi1, cm1, phi2, cm2, phi3, cm3};
+}
+function pnlKenh(tid){ return PNL[tid].kenh.map(tinhPNL); }
+function pnlTong(tid){
+  const ks = pnlKenh(tid);
+  const s = k => ks.reduce((a,b)=>a+b[k],0);
+  return {gmv:s("gmv"), kmBan:s("kmBan"), kmSan:s("kmSan"), hoan:s("hoan"), dtt:s("dtt"),
+    cogs:s("cogs"), lgop:s("lgop"), phi1:s("phi1"), cm1:s("cm1"), phi2:s("phi2"), cm2:s("cm2"),
+    phi3:s("phi3"), cm3:s("cm3"), hh:s("hh"), ttoan:s("ttoan"), dvu:s("dvu"), xtra:s("xtra"),
+    ship:s("ship"), thue:s("thue"), ads:s("ads"), aff:s("aff"), dgoi:s("dgoi"),
+    kho:s("kho"), ns:s("ns"), ht:s("ht")};
+}
+
+/* --- SKU x kênh --- */
+const SKU = {
+ cocoon:[
+  {sku:"CCN-DKC-140", ten:"Dầu tẩy trang dưa leo 140ml", giaVon:68000, kenh:{
+    web:{sl:1840, giaTb:189000}, shopee:{sl:6420, giaTb:151000}, tiktok:{sl:4180, giaTb:129000}, lazada:{sl:1260, giaTb:148000}, gtmt:{sl:2980, giaTb:165000}}},
+  {sku:"CCN-TSD-500", ten:"Tẩy da chết cà phê Đắk Lắk 200g", giaVon:52000, kenh:{
+    web:{sl:1120, giaTb:145000}, shopee:{sl:4860, giaTb:118000}, tiktok:{sl:5940, giaTb:96000}, lazada:{sl:880, giaTb:114000}, gtmt:{sl:1640, giaTb:132000}}},
+  {sku:"CCN-NHT-300", ten:"Nước hoa hồng bí đao 310ml", giaVon:74000, kenh:{
+    web:{sl:960, giaTb:212000}, shopee:{sl:3240, giaTb:174000}, tiktok:{sl:2180, giaTb:158000}, lazada:{sl:640, giaTb:169000}, gtmt:{sl:1420, giaTb:189000}}},
+  {sku:"CCN-SRM-310", ten:"Sữa rửa mặt bí đao 310ml", giaVon:46000, kenh:{
+    web:{sl:1480, giaTb:132000}, shopee:{sl:5120, giaTb:108000}, tiktok:{sl:6840, giaTb:82000}, lazada:{sl:920, giaTb:104000}, gtmt:{sl:2240, giaTb:119000}}},
+  {sku:"CCN-KEM-050", ten:"Kem dưỡng bơ hạt mỡ 50ml", giaVon:96000, kenh:{
+    web:{sl:640, giaTb:268000}, shopee:{sl:2140, giaTb:224000}, tiktok:{sl:1180, giaTb:198000}, lazada:{sl:420, giaTb:216000}, gtmt:{sl:980, giaTb:245000}}},
+  {sku:"CCN-DGD-500", ten:"Sữa tắm dưỡng ẩm 500ml", giaVon:58000, kenh:{
+    web:{sl:820, giaTb:158000}, shopee:{sl:3680, giaTb:124000}, tiktok:{sl:4260, giaTb:94000}, lazada:{sl:560, giaTb:121000}, gtmt:{sl:1860, giaTb:142000}}},
+  {sku:"CCN-SET-CB1", ten:"Combo chăm sóc da 3 món", giaVon:186000, kenh:{
+    web:{sl:420, giaTb:498000}, shopee:{sl:1240, giaTb:386000}, tiktok:{sl:2140, giaTb:298000}, lazada:{sl:280, giaTb:378000}, gtmt:{sl:0, giaTb:0}}},
+  {sku:"CCN-MNA-025", ten:"Mặt nạ đất sét 25g", giaVon:31000, kenh:{
+    web:{sl:1240, giaTb:82000}, shopee:{sl:4180, giaTb:64000}, tiktok:{sl:6280, giaTb:47000}, lazada:{sl:680, giaTb:62000}, gtmt:{sl:1120, giaTb:74000}}},
+  {sku:"CCN-SON-004", ten:"Son dưỡng dầu dừa Bến Tre", giaVon:24000, kenh:{
+    web:{sl:960, giaTb:69000}, shopee:{sl:3860, giaTb:54000}, tiktok:{sl:7420, giaTb:38000}, lazada:{sl:520, giaTb:52000}, gtmt:{sl:2140, giaTb:62000}}},
+  {sku:"CCN-DGL-150", ten:"Dầu gội bưởi 150ml (bản du lịch)", giaVon:29000, kenh:{
+    web:{sl:680, giaTb:76000}, shopee:{sl:2480, giaTb:58000}, tiktok:{sl:3940, giaTb:41000}, lazada:{sl:340, giaTb:56000}, gtmt:{sl:1680, giaTb:68000}}}
+ ]
+};
+/* các khách còn lại dùng chung bộ SKU rút gọn để minh hoạ */
+["vitalux","anzen","mekong","bloomia"].forEach(t=>{ SKU[t] = SKU.cocoon.slice(0,6); });
+
+/* tỷ lệ phí biến đổi theo kênh, dùng cho lớp SKU và cho mô phỏng */
+/* Hiệu chỉnh từ số tổng của kênh trong PNL, không đặt tay:
+   tỷ lệ phí = khoản phí chia doanh thu thuần; cước mỗi đơn vị = tổng cước chia tổng sản lượng. */
+const PHI_KENH = {
+  web:    {hh:0,    ttoan:.011, xtra:0,    shipTb:16500, hoanTb:.024},
+  shopee: {hh:.055, ttoan:.040, xtra:.085, shipTb:5000,  hoanTb:.062},
+  tiktok: {hh:.043, ttoan:.050, xtra:.072, shipTb:4800,  hoanTb:.142},
+  lazada: {hh:.052, ttoan:.040, xtra:.077, shipTb:7800,  hoanTb:.055},
+  gtmt:   {hh:.120, ttoan:0,    xtra:0,    shipTb:8800,  hoanTb:.015}
+};
+
+/* --- dự báo dòng tiền quyết toán: 30 ngày tới --- */
+const CHUKY_QT = {shopee:"T+9", tiktok:"T+7", lazada:"T+12", web:"T+2", gtmt:"45 ngày"};
+function duBaoDongTien(tid){
+  const ks = pnlKenh(tid); const out=[]; let seed=tid.length*7+3;
+  const rnd=()=>{ seed=(seed*9301+49297)%233280; return seed/233280; };
+  const base = ks.reduce((a,b)=>a+b.dtt-b.phi1,0)/30;
+  for(let i=1;i<=30;i++){
+    const d=new Date(2026,8,10+i);
+    const cuoiTuan = d.getDay()===0||d.getDay()===6;
+    const nhip = cuoiTuan?0.72:1.0;
+    const doi = (d.getDate()===d.getMonth()+1)?1.9:1.0; /* ngày đôi */
+    const v = base*nhip*doi*(0.82+rnd()*0.36);
+    const chot = i<=7 ? v*(0.86+rnd()*0.10) : i<=14 ? v*(0.42+rnd()*0.16) : v*0.05;
+    const dukien = Math.max(0, v - chot - v*0.06);
+    const ruiro = v*(0.045+rnd()*0.035);
+    out.push({ngay:d, chot, dukien, ruiro, tong:chot+dukien+ruiro});
+  }
+  return out;
+}
+/* đối chiếu dự báo với thực tế các kỳ đã qua */
+const HAUKIEM = {
+  cocoon:[{ky:"T3",sl:-2.1},{ky:"T4",sl:1.4},{ky:"T5",sl:-0.8},{ky:"T6",sl:2.6},{ky:"T7",sl:-1.2},{ky:"T8",sl:0.9}],
+  vitalux:[{ky:"T5",sl:-4.2},{ky:"T6",sl:3.1},{ky:"T7",sl:-2.4},{ky:"T8",sl:1.8}],
+  anzen:[{ky:"T6",sl:6.4},{ky:"T7",sl:-5.1},{ky:"T8",sl:3.9}],
+  mekong:[{ky:"T7",sl:-3.2},{ky:"T8",sl:2.2}],
+  bloomia:[]
+};
+
+/* --- trường hợp sai lệch --- */
+const NHOM = {
+  qt:{ten:"Quyết toán và dòng tiền", mau:"c-red"},
+  kmm:{ten:"Giá và khuyến mãi", mau:"c-amb"},
+  th:{ten:"Tồn kho và giao hàng", mau:"c-stl"},
+  hd:{ten:"Hoá đơn và thuế", mau:"c-gry"},
+  tp:{ten:"Toàn vẹn tích hợp", mau:"c-stl"}
+};
+const CASES_RAW = [
+ ["QT-2418","qt","Shopee quyết toán thiếu phí Freeship Xtra 3 kỳ liên tiếp","Shopee ↔ Odoo",214_800_000,"mo","cao","Kế toán","09/09"],
+ ["QT-2409","qt","386 đơn COD đã giao nhưng chưa có bút toán thu hộ","GHTK ↔ Odoo",128_400_000,"mo","cao","Vận hành","08/09"],
+ ["KM-1177","kmm","61 SKU bán dưới giá vốn sau 4 lớp giảm giá trên TikTok Shop","TikTok ↔ Odoo",96_200_000,"mo","cao","Thương mại","09/09"],
+ ["TP-0884","tp","Hàng đợi tích hợp Lazada dừng 41 giờ, 1.204 đơn chưa về","Lazada ↔ OMS",0,"mo","cao","IT","09/09"],
+ ["QT-2402","qt","Lazada khấu trừ thuế tại nguồn sai kỳ, chênh 18,4 triệu","Lazada ↔ Odoo",18_400_000,"mo","tb","Kế toán","07/09"],
+ ["TH-0642","th","Tồn kho Shopee lệch 2.184 đơn vị so với kho thực","Shopee ↔ WMS",0,"mo","tb","Vận hành","08/09"],
+ ["KM-1164","kmm","Cụm 47 tài khoản dùng chung mã ưu đãi ra mắt","Magento",34_600_000,"mo","tb","Thương mại","06/09"],
+ ["HD-0391","hd","218 đơn đã giao chưa phát hành hoá đơn quá 7 ngày","Odoo ↔ HĐĐT",0,"mo","tb","Kế toán","07/09"],
+ ["QT-2387","qt","Phí vận chuyển thực trả cao hơn biểu phí hợp đồng 11%","GHN ↔ Odoo",42_100_000,"dong","tb","Vận hành","02/09"],
+ ["TH-0628","th","124 đơn giao thành công nhưng OMS còn trạng thái đang giao","GHN ↔ OMS",0,"dong","thap","Vận hành","01/09"],
+ ["KM-1149","kmm","Chương trình 8.8 vượt ngân sách 19% chưa được duyệt","Magento",0,"dong","tb","Thương mại","29/08"],
+ ["QT-2361","qt","TikTok Shop hoàn tiền 96 đơn nhưng chưa ghi giảm doanh thu","TikTok ↔ Odoo",67_300_000,"dong","cao","Kế toán","26/08"]
+];
+function mkCases(tid){
+  const h = tid.length;
+  return CASES_RAW.map((r,i)=>({
+    ma:r[0], nhom:r[1], td:r[2], nguon:r[3],
+    tien: Math.round(r[4]*(0.55+((h*13+i*7)%50)/50)),
+    tt:r[5], uu:r[6], pt:r[7], ngay:r[8],
+    id:tid+"-"+r[0]
+  })).filter((_,i)=> tid==="bloomia" ? i%2===0 : true);
+}
+
+/* --- hàng chờ phê duyệt (nấc tự chủ 2) --- */
+const APPROVALS = [
+ {ma:"AP-119", td:"Bổ sung ánh xạ SKU cho 11 mã chưa khai báo", he:"Odoo 19", lenh:"mapping.upsert(sku_map, 11 bản ghi)",
+  pv:"11 SKU · 386 đơn treo", hq:"Giải phóng 386 đơn về trạng thái chờ giao", tl:"11/11 khớp, không xung đột", quaylui:true, ts:"Hiệp"},
+ {ma:"AP-121", td:"Ghi giảm doanh thu 96 đơn TikTok đã hoàn tiền", he:"Odoo 19", lenh:"account.move.reverse(96 chứng từ)",
+  pv:"96 đơn · kỳ 8/2026", hq:"Điều chỉnh doanh thu ghi nhận giảm 67,3 triệu", tl:"96/96 có bằng chứng hoàn từ sàn", quaylui:true, ts:"Kế toán"},
+ {ma:"AP-124", td:"Gửi hồ sơ khiếu nại phí Freeship Xtra lên Shopee", he:"Shopee Seller", lenh:"dispute.create(3 kỳ quyết toán)",
+  pv:"3 kỳ · 214,8 triệu", hq:"Mở tranh chấp chính thức với sàn", tl:"Đã dựng bảng kê đối chiếu 3 kỳ", quaylui:false, ts:"Kế toán"},
+ {ma:"AP-126", td:"Tạm dừng 61 SKU đang bán dưới giá vốn trên TikTok Shop", he:"TikTok Shop", lenh:"product.deactivate(61 SKU)",
+  pv:"61 SKU", hq:"Ngừng bán tới khi giá được duyệt lại", tl:"61/61 xác nhận dưới giá vốn", quaylui:true, ts:"Thương mại"}
+];
+
+/* --- nguồn dữ liệu --- */
+const NGUON = [
+ {ten:"Odoo 19 (ERP + OMS)", loai:"CDC", tt:"ok", tre:"2 phút", cuoi:"14:52", ban:"1,24 tr/ngày"},
+ {ten:"Magento 2 (Website)", loai:"API + webhook", tt:"ok", tre:"4 phút", cuoi:"14:50", ban:"186 ng/ngày"},
+ {ten:"Shopee Open Platform", loai:"API", tt:"ok", tre:"22 phút", cuoi:"14:34", ban:"642 ng/ngày"},
+ {ten:"TikTok Shop API", loai:"API", tt:"ok", tre:"18 phút", cuoi:"14:38", ban:"418 ng/ngày"},
+ {ten:"Lazada Open Platform", loai:"API", tt:"loi", tre:"41 giờ", cuoi:"09/09 21:40", ban:"0"},
+ {ten:"GHN", loai:"API", tt:"ok", tre:"31 phút", cuoi:"14:25", ban:"84 ng/ngày"},
+ {ten:"GHTK", loai:"File SFTP", tt:"cho", tre:"1 ngày", cuoi:"09/09 23:00", ban:"62 ng/ngày"},
+ {ten:"Hoá đơn điện tử", loai:"API", tt:"ok", tre:"12 phút", cuoi:"14:44", ban:"38 ng/ngày"}
+];
+
+/* --- quy tắc --- */
+const QUYTAC = [
+ {ma:"R-QT-01", ten:"Chênh lệch phí quyết toán so với biểu phí hợp đồng", nhom:"qt", nguong:"> 0,5% hoặc > 2 triệu/kỳ", bat:true, bat30:38},
+ {ma:"R-QT-04", ten:"Đơn đã giao chưa có bút toán thu hộ COD", nhom:"qt", nguong:"quá 5 ngày kể từ ngày giao", bat:true, bat30:412},
+ {ma:"R-QT-07", ten:"Khấu trừ thuế tại nguồn lệch kỳ", nhom:"qt", nguong:"lệch > 1 kỳ", bat:true, bat30:9},
+ {ma:"R-KM-02", ten:"Giá bán sau chiết khấu thấp hơn giá vốn", nhom:"kmm", nguong:"biên < 0%", bat:true, bat30:61},
+ {ma:"R-KM-05", ten:"Cụm tài khoản dùng chung mã ưu đãi", nhom:"kmm", nguong:"≥ 5 tài khoản chung thiết bị", bat:true, bat30:6},
+ {ma:"R-KM-08", ten:"Chi tiêu chiến dịch vượt ngân sách duyệt", nhom:"kmm", nguong:"> 10%", bat:false, bat30:0},
+ {ma:"R-TH-03", ten:"Tồn kho sàn lệch tồn kho khả dụng", nhom:"th", nguong:"> 2% hoặc > 500 đơn vị", bat:true, bat30:14},
+ {ma:"R-TH-06", ten:"Đơn giao thành công nhưng OMS chưa đóng", nhom:"th", nguong:"quá 48 giờ", bat:true, bat30:124},
+ {ma:"R-HD-01", ten:"Đơn đã giao chưa phát hành hoá đơn", nhom:"hd", nguong:"quá 7 ngày", bat:true, bat30:218},
+ {ma:"R-TP-02", ten:"Hàng đợi tích hợp dừng", nhom:"tp", nguong:"> 30 phút không tiêu thụ", bat:true, bat30:3}
+];
+
+/* --- hồ sơ ánh xạ --- */
+const ANHXA = {
+ cocoon:[["Odoo · Sale Order","Đơn hàng","100%","ok"],["Odoo · Invoice","Chứng từ bán","100%","ok"],["Shopee · Order","Đơn hàng","100%","ok"],["Shopee · Settlement","Bản ghi quyết toán","96%","ok"],["TikTok · Order","Đơn hàng","100%","ok"],["TikTok · Settlement","Bản ghi quyết toán","88%","canh"],["Lazada · Settlement","Bản ghi quyết toán","0%","loi"],["GHN · COD","Thu hộ","100%","ok"],["Magento · Order","Đơn hàng","100%","ok"]],
+ vitalux:[["Odoo · Sale Order","Đơn hàng","100%","ok"],["Shopee · Settlement","Bản ghi quyết toán","92%","ok"],["TikTok · Settlement","Bản ghi quyết toán","74%","canh"],["Lazada · Settlement","Bản ghi quyết toán","62%","canh"],["GHTK · COD","Thu hộ","88%","canh"]],
+ anzen:[["SAP B1 · Sales","Đơn hàng","84%","canh"],["Shopee · Settlement","Bản ghi quyết toán","91%","ok"],["TikTok · Settlement","Bản ghi quyết toán","48%","loi"],["Magento · Order","Đơn hàng","100%","ok"]],
+ mekong:[["Odoo · Sale Order","Đơn hàng","100%","ok"],["Shopee · Settlement","Bản ghi quyết toán","89%","canh"],["Odoo · Stock Move","Xuất nhập kho","64%","canh"]],
+ bloomia:[["Magento · Order","Đơn hàng","82%","canh"],["Shopee · Settlement","Bản ghi quyết toán","41%","loi"],["TikTok · Settlement","Bản ghi quyết toán","0%","loi"],["Bravo · GL","Sổ cái","0%","loi"]]
+};
+
+const NHATKY = [
+ ["10/09 14:48","Hiệp","Phê duyệt AP-119","Ghi 11 bản ghi ánh xạ lên Odoo 19"],
+ ["10/09 14:22","Dũng","Mở trường hợp QT-2418","Xem chi tiết 3 kỳ quyết toán Shopee"],
+ ["10/09 11:05","Hệ thống","Chạy phiên đối soát #4188","Quét 1,24 triệu bản ghi, sinh 6 trường hợp"],
+ ["10/09 09:31","Hiệp","Tắt quy tắc R-KM-08","Lý do: ngưỡng đang gây báo động giả"],
+ ["09/09 21:40","Hệ thống","Nguồn Lazada mất kết nối","Hàng đợi dừng, đã cảnh báo IT"],
+ ["09/09 16:12","Dũng","Giao QT-2409 cho Vận hành","Kèm ghi chú đối chiếu file GHTK"],
+ ["09/09 10:44","Kế toán","Đóng trường hợp QT-2387","Đã thu hồi 42,1 triệu từ GHN"]
+];
+
+const PHIEN = [
+ ["#4188","10/09 11:00","Toàn phần","1.240.882","6","4 phút 12 giây","xong"],
+ ["#4187","10/09 05:00","Toàn phần","1.238.104","4","4 phút 02 giây","xong"],
+ ["#4186","09/09 23:00","Gia tăng","186.402","2","51 giây","xong"],
+ ["#4185","09/09 17:00","Gia tăng","174.988","3","48 giây","xong"],
+ ["#4184","09/09 11:00","Toàn phần","1.229.640","9","4 phút 21 giây","xong"],
+ ["#4183","09/09 05:00","Toàn phần","1.226.118","0","3 phút 58 giây","canh"]
+];
+
+const NGUOIDUNG = [
+ ["Phạm Quang Hậu","Chủ tài khoản","Toàn quyền","Tất cả","10/09 14:51"],
+ ["Nguyễn Văn Hiệp","Quản trị kỹ thuật","Quy tắc, ánh xạ, phê duyệt","Tất cả","10/09 14:48"],
+ ["Trần Minh Dũng","Phân tích","Xem, giao việc, xuất báo cáo","Tất cả","10/09 14:22"],
+ ["Lê Thu Hà","Kế toán trưởng","Xem, đóng trường hợp","Cocoon","10/09 09:44"],
+ ["Đỗ Quốc Anh","Vận hành","Xem, đóng trường hợp","Cocoon","09/09 16:30"]
+];
+/* ==================== TRẠNG THÁI ==================== */
+const S = {
+  tid:"cocoon", man:"bang", tab:0, tab2:0, caseId:null, tim:"",
+  locNhom:"all", locTT:"mo", sapXep:"tien",
+  quyTac:JSON.parse(JSON.stringify(QUYTAC)),
+  cases:{}, duyet:JSON.parse(JSON.stringify(APPROVALS)), nhatky:JSON.parse(JSON.stringify(NHATKY)),
+  hienCM3:false, pnlTab:"kenh", dbTab:"tien",
+  sim:{kenh:"tiktok", giam:22, ads:8, xtra:true, voucher:true, aff:14}
+};
+TENANTS.forEach(t=> S.cases[t.id]=mkCases(t.id));
+
+const MAN = [
+  {g:"Vận hành"},
+  {id:"bang", ten:"Bảng điều khiển", ic:"▤"},
+  {id:"case", ten:"Trường hợp sai lệch", ic:"⚠", bdg:()=>S.cases[S.tid].filter(c=>c.tt==="mo").length, hot:true},
+  {id:"duyet", ten:"Hàng chờ phê duyệt", ic:"✓", bdg:()=>S.duyet.length},
+  {g:"Nghiệp vụ"},
+  {id:"pnl", ten:"P&L kênh bán", ic:"◫", moi:true},
+  {id:"dubao", ten:"Dự báo", ic:"◷", moi:true},
+  {id:"dtien", ten:"Đối soát dòng tiền", ic:"₫"},
+  {id:"khuyenmai", ten:"Kiểm soát khuyến mãi", ic:"%"},
+  {g:"Cấu hình"},
+  {id:"quytac", ten:"Quy tắc phát hiện", ic:"⚙"},
+  {id:"anhxa", ten:"Hồ sơ ánh xạ", ic:"⇄"},
+  {id:"nguon", ten:"Nguồn dữ liệu", ic:"⛁", bdg:()=>NGUON.filter(n=>n.tt==="loi").length, hot:true},
+  {id:"phien", ten:"Phiên đối soát", ic:"↻"},
+  {g:"Quản trị"},
+  {id:"nguoidung", ten:"Người dùng", ic:"◉"},
+  {id:"nhatky", ten:"Nhật ký kiểm toán", ic:"≡"}
+];
+const TIEUDE = {bang:["Bảng điều khiển","Tổng quan sai lệch và giá trị phát hiện"],
+ case:["Trường hợp sai lệch","Danh sách đầy đủ, lọc và xử lý"],
+ duyet:["Hàng chờ phê duyệt","Lệnh sẽ ghi lên hệ thống nguồn, cần người duyệt"],
+ pnl:["P&L kênh bán","Biên lợi nhuận dựng trên số đã đối soát với quyết toán"],
+ dubao:["Dự báo","Dòng tiền quyết toán, mô phỏng kịch bản và hậu kiểm"],
+ dtien:["Đối soát dòng tiền","Kỳ quyết toán theo kênh và hồ sơ khiếu nại"],
+ khuyenmai:["Kiểm soát khuyến mãi","Ngân sách chiến dịch, biên lợi nhuận và lạm dụng ưu đãi"],
+ quytac:["Quy tắc phát hiện","Ngưỡng và điều kiện theo từng khách hàng"],
+ anhxa:["Hồ sơ ánh xạ","Độ phủ khai báo quyết định phần sản phẩm dùng được"],
+ nguon:["Nguồn dữ liệu","Trạng thái kết nối và độ trễ"],
+ phien:["Phiên đối soát","Lịch sử các lần chạy engine"],
+ nguoidung:["Người dùng","Vai trò và phạm vi truy cập"],
+ nhatky:["Nhật ký kiểm toán","Mọi thao tác đều được ghi lại"]};
+
+/* ==================== TIỆN ÍCH DỰNG HÌNH ==================== */
+const $ = s => document.querySelector(s);
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function toast(m){ const t=document.createElement("div"); t.className="toast"; t.textContent=m;
+  document.body.appendChild(t); setTimeout(()=>t.remove(),2400); }
+function ghiNhatKy(ai,vc,ct){ const d=new Date();
+  S.nhatky.unshift([`${String(d.getDate()).padStart(2,"0")}/${String(d.getMonth()+1).padStart(2,"0")} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`,ai,vc,ct]); }
+function tt(t){ return S.tid===t; }
+function kh(){ return TENANTS.find(t=>t.id===S.tid); }
+function qChip(q){ const m={r:["q-r","đã đối soát"],e:["q-e","ước tính"],n:["q-n","chưa có dữ liệu"]};
+  const [c,l]=m[q]||m.n; return `<span class="q ${c}" title="${l}"></span>`; }
+
+function ve(){
+  $("#app").innerHTML = `<div class="app">${veNav()}<div class="main">${veHdr()}<div class="body" id="body"></div></div></div>`;
+  $("#body").innerHTML = veMan();
+  gan();
+  $("#body").scrollTop = 0;
+}
+function veNav(){
+  let h = `<nav class="nav"><div class="logo"><div class="mark">O</div><div><b>OPSCORE</b><em>Kiểm soát vận hành</em></div></div>
+   <div class="tenantbox"><label>Khách hàng</label><select id="selTenant">${
+     TENANTS.map(t=>`<option value="${t.id}" ${tt(t.id)?"selected":""}>${esc(t.ten)}</option>`).join("")}</select></div>`;
+  MAN.forEach(m=>{
+    if(m.g){ h+=`</div><div class="navgrp"><h6>${m.g}</h6>`; return; }
+    const b = m.bdg?m.bdg():0;
+    h+=`<button class="navitem ${S.man===m.id?"on":""}" data-man="${m.id}">
+      <span class="ic">${m.ic}</span><span>${m.ten}</span>
+      ${m.moi?`<span class="bdg new">mới</span>`:""}
+      ${b?`<span class="bdg ${m.hot?"hot":""}">${b}</span>`:""}</button>`;
+  });
+  h+=`</div><div class="navfoot"><b>Phiên #4188</b>10/09/2026 · 11:00 · 4 phút 12 giây</div></nav>`;
+  return h.replace("</div><div class=\"navgrp\">","<div class=\"navgrp\">");
+}
+function veHdr(){
+  const [t,s]=TIEUDE[S.man]||["",""];
+  return `<div class="hdr"><div><h1>${t}</h1></div><div class="sub">${s}</div>
+   <div class="sp"><span class="demoflag" title="Số liệu dựng để minh hoạ sản phẩm, không phải số đo trên hệ thống khách hàng">Dữ liệu minh hoạ</span><div class="search"><span>⌕</span><input id="oTim" placeholder="Tìm mã, mô tả, SKU…  ( / )" value="${esc(S.tim)}"></div>
+   <button class="btn sm" id="btnXuat">Xuất bảng kê</button></div></div>`;
+}
+function veMan(){
+  switch(S.man){
+    case "bang": return manBang();
+    case "case": return S.caseId? manCaseCT() : manCase();
+    case "duyet": return manDuyet();
+    case "pnl": return manPNL();
+    case "dubao": return manDuBao();
+    case "dtien": return manDongTien();
+    case "khuyenmai": return manKhuyenMai();
+    case "quytac": return manQuyTac();
+    case "anhxa": return manAnhXa();
+    case "nguon": return manNguon();
+    case "phien": return manPhien();
+    case "nguoidung": return manNguoiDung();
+    case "nhatky": return manNhatKy();
+  }
+  return "";
+}
+
+/* ==================== BẢNG ĐIỀU KHIỂN ==================== */
+function manBang(){
+  const cs = S.cases[S.tid], mo = cs.filter(c=>c.tt==="mo"), dong = cs.filter(c=>c.tt==="dong");
+  const tienMo = mo.reduce((a,b)=>a+b.tien,0), tienThu = dong.reduce((a,b)=>a+b.tien,0);
+  const p = pnlTong(S.tid), k = kh();
+  const tuan = [42,58,37,64,88,71,96,124,109,142,118,167];
+  const max = Math.max(...tuan);
+  const theoNhom = Object.keys(NHOM).map(n=>({n, c:mo.filter(x=>x.nhom===n).length, t:mo.filter(x=>x.nhom===n).reduce((a,b)=>a+b.tien,0)})).filter(x=>x.c);
+  const maxN = Math.max(...theoNhom.map(x=>x.t),1);
+  return `
+  <div class="grid g4" style="margin-bottom:14px">
+    <div class="kpi al"><div class="lb">Giá trị đang treo</div><div class="vl mono">${vnd(tienMo)}</div><div class="dt">${mo.length} trường hợp chưa xử lý</div></div>
+    <div class="kpi ok"><div class="lb">Đã thu hồi hoặc chặn được</div><div class="vl mono">${vnd(tienThu)}</div><div class="dt">${dong.length} trường hợp đã đóng, luỹ kế 90 ngày</div></div>
+    <div class="kpi"><div class="lb">Biên đóng góp CM1 kỳ này</div><div class="vl mono">${vnd(p.cm1)}</div><div class="dt">${pc(p.cm1,p.dtt)} doanh thu thuần · <a href="#" data-go="pnl">xem P&amp;L</a></div></div>
+    <div class="kpi"><div class="lb">Tiền sàn sẽ về 30 ngày tới</div><div class="vl mono">${vnd(duBaoDongTien(S.tid).reduce((a,b)=>a+b.tong,0))}</div><div class="dt">Dự báo · <a href="#" data-go="dubao">xem chi tiết</a></div></div>
+  </div>
+  <div class="grid g2" style="margin-bottom:14px">
+    <div class="card"><h3>Giá trị phát hiện theo tuần<span class="r">12 tuần gần nhất, đơn vị triệu đồng</span></h3><div class="pad">
+      <div class="spark" style="height:104px">${tuan.map((v,i)=>`<i class="${i>=9?"hi":""}" style="height:${v/max*100}%" title="Tuần ${i+1}: ${v} triệu"></i>`).join("")}</div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--ink3);margin-top:6px"><span>Tuần 24</span><span>Tuần 36</span></div>
+    </div></div>
+    <div class="card"><h3>Phân rã theo nhóm sai lệch</h3><div class="pad">
+      ${theoNhom.map(x=>`<div style="margin-bottom:11px">
+        <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px">
+          <span>${NHOM[x.n].ten} <span style="color:var(--ink3)">· ${x.c} trường hợp</span></span>
+          <b class="mono">${vnd(x.t)}</b></div>
+        <div class="bar"><i style="width:${x.t/maxN*100}%"></i></div></div>`).join("")}
+    </div></div>
+  </div>
+  <div class="grid g2">
+    <div class="card"><h3>Cần xử lý gấp<span class="r">ưu tiên cao, đang mở</span></h3>
+      <table>${mo.filter(c=>c.uu==="cao").slice(0,5).map(c=>`<tr class="tr-click" data-case="${c.ma}">
+        <td style="width:74px"><span class="mono" style="font-size:12px">${c.ma}</span></td>
+        <td>${esc(c.td)}<div style="font-size:11.5px;color:var(--ink3);margin-top:2px">${c.nguon} · ${c.pt}</div></td>
+        <td class="num" style="width:96px"><b>${c.tien?vnd(c.tien):"—"}</b></td></tr>`).join("")}</table></div>
+    <div class="card"><h3>Nguồn dữ liệu<span class="r">${NGUON.filter(n=>n.tt==="ok").length}/${NGUON.length} bình thường</span></h3>
+      <table>${NGUON.map(n=>`<tr><td style="width:18px">${n.tt==="ok"?'<span class="chip c-grn"><i class="dot"></i></span>':n.tt==="loi"?'<span class="chip c-red"><i class="dot"></i></span>':'<span class="chip c-amb"><i class="dot"></i></span>'}</td>
+        <td>${n.ten}<div style="font-size:11.5px;color:var(--ink3)">${n.loai}</div></td>
+        <td class="num" style="font-size:12px;color:${n.tt==="loi"?"var(--red)":"var(--ink2)"}">${n.tre}</td></tr>`).join("")}</table></div>
+  </div>`;
+}
+
+/* ==================== TRƯỜNG HỢP ==================== */
+function manCase(){
+  let cs = S.cases[S.tid].slice();
+  if(S.locTT!=="all") cs = cs.filter(c=>c.tt===S.locTT);
+  if(S.locNhom!=="all") cs = cs.filter(c=>c.nhom===S.locNhom);
+  if(S.tim) cs = cs.filter(c=> kd(c.td+c.ma+c.nguon).includes(kd(S.tim)));
+  cs.sort((a,b)=> S.sapXep==="tien"? b.tien-a.tien : S.sapXep==="uu"? ({cao:0,tb:1,thap:2}[a.uu]-{cao:0,tb:1,thap:2}[b.uu]) : a.ma.localeCompare(b.ma));
+  return `
+  <div style="display:flex;gap:9px;align-items:center;margin-bottom:13px;flex-wrap:wrap">
+    <div class="pills">${[["mo","Đang mở"],["dong","Đã đóng"],["all","Tất cả"]].map(([v,t])=>
+      `<button class="${S.locTT===v?"on":""}" data-loctt="${v}">${t}</button>`).join("")}</div>
+    <span style="width:1px;height:20px;background:var(--line)"></span>
+    <div class="pills"><button class="${S.locNhom==="all"?"on":""}" data-locnhom="all">Mọi nhóm</button>
+      ${Object.entries(NHOM).map(([k,v])=>`<button class="${S.locNhom===k?"on":""}" data-locnhom="${k}">${v.ten}</button>`).join("")}</div>
+    <div style="margin-left:auto;display:flex;gap:7px;align-items:center">
+      <span style="font-size:12px;color:var(--ink3)">Sắp xếp</span>
+      <select id="selSap" style="padding:5px 8px;border:1px solid var(--line);border-radius:7px;background:var(--card)">
+        <option value="tien" ${S.sapXep==="tien"?"selected":""}>Giá trị giảm dần</option>
+        <option value="uu" ${S.sapXep==="uu"?"selected":""}>Ưu tiên</option>
+        <option value="ma" ${S.sapXep==="ma"?"selected":""}>Mã</option></select></div>
+  </div>
+  <div class="card"><table>
+    <thead><tr><th style="width:80px">Mã</th><th>Mô tả</th><th style="width:140px">Đối chiếu</th><th style="width:96px">Nhóm</th><th style="width:70px">Ưu tiên</th><th style="width:100px" class="num">Giá trị</th><th style="width:88px">Phụ trách</th></tr></thead>
+    <tbody>${cs.length? cs.map(c=>`<tr class="tr-click" data-case="${c.ma}">
+      <td class="mono" style="font-size:12px">${c.ma}</td>
+      <td>${esc(c.td)}${c.tt==="dong"?' <span class="chip c-grn">đã đóng</span>':""}</td>
+      <td style="font-size:12px;color:var(--ink2)">${c.nguon}</td>
+      <td><span class="chip ${NHOM[c.nhom].mau}">${NHOM[c.nhom].ten.split(" ")[0]}</span></td>
+      <td><span class="chip ${c.uu==="cao"?"c-red":c.uu==="tb"?"c-amb":"c-gry"}">${c.uu==="cao"?"Cao":c.uu==="tb"?"Trung bình":"Thấp"}</span></td>
+      <td class="num"><b>${c.tien?vnd(c.tien):"—"}</b></td>
+      <td style="font-size:12.5px">${c.pt}</td></tr>`).join("")
+      : `<tr><td colspan="7"><div class="empty"><b>Không có trường hợp nào khớp bộ lọc</b>Đổi bộ lọc hoặc xoá từ khoá tìm kiếm.</div></td></tr>`}</tbody>
+  </table></div>`;
+}
+function manCaseCT(){
+  const c = S.cases[S.tid].find(x=>x.ma===S.caseId); if(!c) return "";
+  const qt = S.quyTac.find(q=>q.nhom===c.nhom) || S.quyTac[0];
+  return `
+  <div style="font-size:12.5px;color:var(--ink3);margin-bottom:11px">
+    <a href="#" data-back="1">Trường hợp sai lệch</a> › <span class="mono">${c.ma}</span></div>
+  <div class="card" style="margin-bottom:14px"><div class="pad">
+    <div style="display:flex;gap:13px;align-items:flex-start">
+      <div style="flex:1"><h2 style="margin:0 0 6px;font-size:18px;font-weight:600;letter-spacing:-.01em">${esc(c.td)}</h2>
+        <div style="display:flex;gap:7px;flex-wrap:wrap">
+          <span class="chip ${NHOM[c.nhom].mau}">${NHOM[c.nhom].ten}</span>
+          <span class="chip ${c.uu==="cao"?"c-red":"c-amb"}">Ưu tiên ${c.uu==="cao"?"cao":"trung bình"}</span>
+          <span class="chip c-gry">${c.nguon}</span><span class="chip c-gry">Phát hiện ${c.ngay}</span></div></div>
+      <div style="text-align:right"><div style="font-size:11.5px;color:var(--ink3)">Giá trị ước lượng</div>
+        <div class="mono" style="font-size:26px;font-weight:600;color:${c.tien?"var(--red)":"var(--ink3)"}">${c.tien?vnd(c.tien):"Chưa định lượng"}</div></div>
+    </div></div></div>
+  <div class="grid g2" style="margin-bottom:14px">
+    <div class="card"><h3>Dải đối soát</h3><div class="pad">
+      <table style="font-size:12.5px">
+        <tr><td style="color:var(--ink3);width:150px">Hệ thống A</td><td><b>${c.nguon.split("↔")[0]}</b></td><td class="num mono">${vnd(c.tien*4.2)}</td></tr>
+        <tr><td style="color:var(--ink3)">Hệ thống B</td><td><b>${(c.nguon.split("↔")[1]||"—").trim()}</b></td><td class="num mono">${vnd(c.tien*4.2-c.tien)}</td></tr>
+        <tr style="background:var(--red-soft)"><td style="color:var(--red)"><b>Chênh lệch</b></td><td></td><td class="num mono"><b style="color:var(--red)">${vnd(c.tien)}</b></td></tr>
+      </table>
+      <div class="note stl" style="margin-top:12px"><span>ℹ</span><div>OPSCORE chỉ đọc, không ghi lên hệ thống nguồn. Mọi hành động thay đổi dữ liệu đều đi qua <a href="#" data-go="duyet">hàng chờ phê duyệt</a>.</div></div>
+    </div></div>
+    <div class="card"><h3>Quy tắc đã bắt được</h3><div class="pad">
+      <div class="mono" style="font-size:12px;color:var(--steel);margin-bottom:5px">${qt.ma}</div>
+      <div style="font-weight:600;margin-bottom:4px">${qt.ten}</div>
+      <div style="font-size:12.5px;color:var(--ink2)">Ngưỡng áp dụng cho ${kh().ten}: <b>${qt.nguong}</b></div>
+      <div style="font-size:12.5px;color:var(--ink3);margin-top:9px">Quy tắc này bắt được ${qt.bat30} trường hợp trong 30 ngày qua.</div>
+    </div></div>
+  </div>
+  <div class="card"><h3>Dòng thời gian</h3><table>
+    <tr><td style="width:96px;font-size:12px;color:var(--ink3)">${c.ngay} 11:02</td><td>Engine sinh trường hợp từ phiên #4188</td></tr>
+    <tr><td style="font-size:12px;color:var(--ink3)">${c.ngay} 14:22</td><td>Dũng mở xem chi tiết</td></tr>
+    <tr><td style="font-size:12px;color:var(--ink3)">${c.ngay} 16:12</td><td>Giao cho bộ phận ${c.pt}</td></tr>
+    ${c.tt==="dong"?`<tr><td style="font-size:12px;color:var(--ink3)">${c.ngay} 17:40</td><td><span class="chip c-grn">Đã đóng</span> Thu hồi được ${vnd(c.tien)}</td></tr>`:""}
+  </table>
+  <div class="pad" style="display:flex;gap:8px;border-top:1px solid var(--line2)">
+    ${c.tt==="mo"?`<button class="btn pri" data-dong="${c.ma}">Đóng trường hợp</button>
+    <button class="btn" data-giao="${c.ma}">Giao cho bộ phận</button>`:`<button class="btn" data-mo="${c.ma}">Mở lại</button>`}
+    <button class="btn" data-back="1" style="margin-left:auto">Quay lại danh sách</button></div></div>`;
+}
+
+/* ==================== HÀNG CHỜ PHÊ DUYỆT ==================== */
+function manDuyet(){
+  if(!S.duyet.length) return `<div class="card"><div class="empty"><b>Không còn yêu cầu nào chờ duyệt</b>Yêu cầu mới sẽ xuất hiện ở đây khi engine đề xuất một hành động ghi lên hệ thống nguồn.</div></div>`;
+  return `<div class="note" style="margin-bottom:14px"><span>⚠</span><div><b>Mỗi yêu cầu dưới đây sẽ ghi lên hệ thống nguồn khi được duyệt.</b> Đọc kỹ khối lệnh và kết quả chạy thử trước khi bấm. Yêu cầu không quay lui được có nhãn đỏ.</div></div>
+  ${S.duyet.map(a=>`<div class="card" style="margin-bottom:12px"><div class="pad">
+    <div style="display:flex;gap:11px;align-items:flex-start;margin-bottom:11px">
+      <div style="flex:1"><div class="mono" style="font-size:12px;color:var(--steel)">${a.ma}</div>
+        <div style="font-size:15px;font-weight:600;margin-top:2px">${esc(a.td)}</div>
+        <div style="font-size:12.5px;color:var(--ink3);margin-top:3px">Đề xuất cho ${a.ts} · hệ thống đích ${a.he}</div></div>
+      ${a.quaylui?'<span class="chip c-grn">Quay lui được</span>':'<span class="chip c-red">Không quay lui được</span>'}
+    </div>
+    <div style="background:#FAFAF8;border:1px solid var(--line);border-radius:8px;padding:11px 13px;margin-bottom:11px">
+      <div style="font-size:11px;color:var(--ink3);margin-bottom:4px">Lệnh sẽ thực thi</div>
+      <div class="mono" style="font-size:12.5px;color:var(--steel);margin-bottom:9px">${esc(a.lenh)}</div>
+      <table style="font-size:12.5px"><tr><td style="width:112px;color:var(--ink3);padding:3px 0;border:0">Phạm vi</td><td style="padding:3px 0;border:0">${a.pv}</td></tr>
+      <tr><td style="color:var(--ink3);padding:3px 0;border:0">Hiệu lực</td><td style="padding:3px 0;border:0">${a.hq}</td></tr>
+      <tr><td style="color:var(--ink3);padding:3px 0;border:0">Chạy thử</td><td style="padding:3px 0;border:0"><span class="chip c-grn">${a.tl}</span></td></tr></table>
+    </div>
+    <div style="display:flex;gap:8px"><button class="btn pri" data-duyet="${a.ma}">Phê duyệt và thực thi</button>
+      <button class="btn" data-tuchoi="${a.ma}">Từ chối</button></div>
+  </div></div>`).join("")}`;
+}
+
+/* ==================== ĐỐI SOÁT DÒNG TIỀN ==================== */
+function manDongTien(){
+  const ks = pnlKenh(S.tid).filter(k=>k.k!=="gtmt");
+  return `<div class="card" style="margin-bottom:14px"><h3>Kỳ quyết toán theo kênh<span class="r">${KY}</span></h3><table>
+    <thead><tr><th>Kênh</th><th>Chu kỳ</th><th class="num">Sàn báo sẽ trả</th><th class="num">Thực nhận</th><th class="num">Chênh lệch</th><th style="width:110px">Tỷ lệ khớp</th><th>Trạng thái</th></tr></thead>
+    <tbody>${ks.map((k,i)=>{
+      const bao = k.dtt-k.phi1, lech = [0,-214.8*T,-18.4*T,-67.3*T][i%4]||0, nhan=bao+lech;
+      const tl = (100+lech/bao*100).toFixed(1);
+      return `<tr><td><b>${k.ten}</b></td><td class="mono" style="font-size:12px">${CHUKY_QT[k.k]||"—"}</td>
+      <td class="num mono">${vnd(bao)}</td><td class="num mono">${vnd(nhan)}</td>
+      <td class="num mono" style="color:${lech?"var(--red)":"var(--grn)"}"><b>${lech?vnd(lech):"0"}</b></td>
+      <td><div class="bar"><i style="width:${tl}%;background:${lech?"var(--red)":"var(--grn)"}"></i></div><div style="font-size:11px;color:var(--ink3);margin-top:3px">${tl}%</div></td>
+      <td>${lech?'<span class="chip c-red">Có chênh lệch</span>':'<span class="chip c-grn">Khớp</span>'}</td></tr>`;}).join("")}</tbody></table></div>
+  <div class="card"><h3>Hồ sơ khiếu nại<span class="r">từ lúc lập đến lúc thu được tiền</span></h3><table>
+    <thead><tr><th>Mã</th><th>Nội dung</th><th>Kênh</th><th class="num">Số tiền</th><th>Lập ngày</th><th>Trạng thái</th></tr></thead>
+    <tr><td class="mono" style="font-size:12px">KN-041</td><td>Phí Freeship Xtra thu vượt biểu phí 3 kỳ</td><td>Shopee</td><td class="num mono">214,8 tr</td><td>09/09</td><td><span class="chip c-amb">Sàn đang xem xét</span></td></tr>
+    <tr><td class="mono" style="font-size:12px">KN-038</td><td>Khấu trừ thuế tại nguồn sai kỳ</td><td>Lazada</td><td class="num mono">18,4 tr</td><td>07/09</td><td><span class="chip c-stl">Đã gửi</span></td></tr>
+    <tr><td class="mono" style="font-size:12px">KN-034</td><td>Cước vận chuyển cao hơn hợp đồng 11%</td><td>GHN</td><td class="num mono">42,1 tr</td><td>26/08</td><td><span class="chip c-grn">Đã thu hồi</span></td></tr>
+    <tr><td class="mono" style="font-size:12px">KN-031</td><td>Hoàn tiền 96 đơn chưa ghi giảm doanh thu</td><td>TikTok</td><td class="num mono">67,3 tr</td><td>21/08</td><td><span class="chip c-grn">Đã thu hồi</span></td></tr>
+  </table></div>`;
+}
+
+/* ==================== KIỂM SOÁT KHUYẾN MÃI ==================== */
+function manKhuyenMai(){
+  const cd = [["CD-0912","Ngày đôi 9.9","09/09",1800*T,2142*T,18.4],["CD-0808","Ngày đôi 8.8","08/08",1400*T,1666*T,14.2],
+    ["CD-0725","Sinh nhật thương hiệu","25/07",900*T,884*T,22.6],["CD-0707","Ngày đôi 7.7","07/07",1200*T,1188*T,16.8]];
+  return `<div class="card" style="margin-bottom:14px"><h3>Ngân sách chiến dịch so với đã dùng</h3><table>
+    <thead><tr><th>Mã</th><th>Chiến dịch</th><th>Ngày</th><th class="num">Ngân sách duyệt</th><th class="num">Đã dùng</th><th style="width:130px">Mức dùng</th><th class="num">Biên trung bình</th></tr></thead>
+    ${cd.map(([m,t,n,ns,dd,bi])=>{const v=dd/ns*100; return `<tr><td class="mono" style="font-size:12px">${m}</td><td><b>${t}</b></td><td>${n}</td>
+      <td class="num mono">${vnd(ns)}</td><td class="num mono">${vnd(dd)}</td>
+      <td><div class="bar"><i style="width:${Math.min(v,100)}%;background:${v>100?"var(--red)":"var(--steel)"}"></i></div>
+        <div style="font-size:11px;color:${v>100?"var(--red)":"var(--ink3)"};margin-top:3px">${v.toFixed(0)}%${v>100?" · vượt":""}</div></td>
+      <td class="num mono" style="color:${bi<15?"var(--amb)":"var(--ink)"}">${bi}%</td></tr>`;}).join("")}
+  </table></div>
+  <div class="card"><h3>Cụm tài khoản nghi lạm dụng ưu đãi<span class="r">6 cụm phát hiện trong 30 ngày</span></h3><table>
+    <thead><tr><th>Cụm</th><th>Dấu hiệu chung</th><th class="num">Số tài khoản</th><th class="num">Số đơn</th><th class="num">Giá trị ưu đãi</th></tr></thead>
+    <tr><td class="mono" style="font-size:12px">CL-06</td><td>Chung dấu vân thiết bị, khác số điện thoại</td><td class="num">47</td><td class="num">312</td><td class="num mono"><b>34,6 tr</b></td></tr>
+    <tr><td class="mono" style="font-size:12px">CL-05</td><td>Chung địa chỉ giao, tạo trong 48 giờ</td><td class="num">21</td><td class="num">148</td><td class="num mono">16,2 tr</td></tr>
+    <tr><td class="mono" style="font-size:12px">CL-04</td><td>Chung thẻ thanh toán</td><td class="num">14</td><td class="num">96</td><td class="num mono">11,4 tr</td></tr>
+  </table></div>`;
+}
+
+/* ==================== CẤU HÌNH VÀ QUẢN TRỊ ==================== */
+function manQuyTac(){
+  return `<div class="card"><h3>Quy tắc phát hiện<span class="r">${S.quyTac.filter(q=>q.bat).length}/${S.quyTac.length} đang bật cho ${kh().ten}</span></h3><table>
+   <thead><tr><th style="width:88px">Mã</th><th>Quy tắc</th><th style="width:104px">Nhóm</th><th style="width:210px">Ngưỡng</th><th class="num" style="width:104px">Bắt 30 ngày</th><th style="width:58px">Bật</th></tr></thead>
+   ${S.quyTac.map(q=>`<tr><td class="mono" style="font-size:12px">${q.ma}</td><td>${q.ten}</td>
+     <td><span class="chip ${NHOM[q.nhom].mau}">${NHOM[q.nhom].ten.split(" ")[0]}</span></td>
+     <td class="mono" style="font-size:12px;color:var(--ink2)">${q.nguong}</td>
+     <td class="num"><b>${q.bat?q.bat30:"—"}</b></td>
+     <td><button class="sw ${q.bat?"on":""}" data-qt="${q.ma}" aria-label="Bật tắt ${q.ma}"></button></td></tr>`).join("")}
+  </table></div>`;
+}
+function manAnhXa(){
+  const rows = ANHXA[S.tid]||[];
+  const k = kh();
+  return `<div class="note ${k.covMap<70?"":"stl"}" style="margin-bottom:14px"><span>${k.covMap<70?"⚠":"ℹ"}</span>
+   <div><b>Độ phủ ánh xạ ${k.covMap}%.</b> Phần khác biệt giữa các khách hàng nằm gọn trong hồ sơ này; quy tắc phát hiện thì dùng chung.
+   Nguồn nào chưa ánh xạ thì mọi quy tắc chạm tới nguồn đó không chạy được, kể cả khi quy tắc đang bật.</div></div>
+  <div class="card"><table><thead><tr><th>Đối tượng nguồn</th><th>Ánh xạ về</th><th style="width:150px">Độ phủ</th><th style="width:110px">Trạng thái</th></tr></thead>
+   ${rows.map(([a,b,c,d])=>`<tr><td><b>${a}</b></td><td>${b}</td>
+     <td><div class="bar"><i style="width:${parseInt(c)}%;background:${d==="loi"?"var(--red)":d==="canh"?"var(--amb)":"var(--grn)"}"></i></div>
+       <div style="font-size:11px;color:var(--ink3);margin-top:3px">${c}</div></td>
+     <td>${d==="ok"?'<span class="chip c-grn">Đủ dùng</span>':d==="canh"?'<span class="chip c-amb">Thiếu một phần</span>':'<span class="chip c-red">Chưa ánh xạ</span>'}</td></tr>`).join("")}
+  </table></div>`;
+}
+function manNguon(){
+  return `<div class="grid g3">${NGUON.map(n=>`<div class="card"><div class="pad">
+    <div style="display:flex;align-items:flex-start;gap:9px;margin-bottom:9px">
+      <div style="flex:1"><b style="font-size:14px">${n.ten}</b><div style="font-size:12px;color:var(--ink3);margin-top:2px">${n.loai}</div></div>
+      ${n.tt==="ok"?'<span class="chip c-grn"><i class="dot"></i>Bình thường</span>':n.tt==="loi"?'<span class="chip c-red"><i class="dot"></i>Mất kết nối</span>':'<span class="chip c-amb"><i class="dot"></i>Chờ tệp</span>'}
+    </div>
+    <table style="font-size:12.5px"><tr><td style="color:var(--ink3);padding:3px 0;border:0">Độ trễ</td><td class="num mono" style="padding:3px 0;border:0;color:${n.tt==="loi"?"var(--red)":""}">${n.tre}</td></tr>
+    <tr><td style="color:var(--ink3);padding:3px 0;border:0">Đồng bộ cuối</td><td class="num mono" style="padding:3px 0;border:0">${n.cuoi}</td></tr>
+    <tr><td style="color:var(--ink3);padding:3px 0;border:0">Bản ghi</td><td class="num mono" style="padding:3px 0;border:0">${n.ban}</td></tr></table>
+  </div></div>`).join("")}</div>`;
+}
+function manPhien(){
+  return `<div class="card"><table><thead><tr><th style="width:74px">Phiên</th><th style="width:130px">Bắt đầu</th><th style="width:96px">Phạm vi</th><th class="num">Bản ghi quét</th><th class="num">Trường hợp sinh ra</th><th style="width:130px">Thời lượng</th><th style="width:110px">Kết quả</th></tr></thead>
+   ${PHIEN.map(p=>`<tr><td class="mono" style="font-size:12px">${p[0]}</td><td>${p[1]}</td><td>${p[2]}</td>
+     <td class="num mono">${p[3]}</td><td class="num"><b>${p[4]}</b></td><td class="mono" style="font-size:12px">${p[5]}</td>
+     <td>${p[6]==="xong"?'<span class="chip c-grn">Hoàn tất</span>':'<span class="chip c-amb">Thiếu nguồn</span>'}</td></tr>`).join("")}
+  </table></div>`;
+}
+function manNguoiDung(){
+  return `<div class="card"><h3>Người dùng<span class="r">Đăng nhập một lần theo từng khách hàng</span></h3><table>
+   <thead><tr><th>Tên</th><th>Vai trò</th><th>Quyền</th><th>Phạm vi khách hàng</th><th>Hoạt động cuối</th></tr></thead>
+   ${NGUOIDUNG.map(u=>`<tr><td><b>${u[0]}</b></td><td><span class="chip c-stl">${u[1]}</span></td><td style="font-size:12.5px;color:var(--ink2)">${u[2]}</td><td>${u[3]}</td><td class="mono" style="font-size:12px">${u[4]}</td></tr>`).join("")}
+  </table></div>`;
+}
+function manNhatKy(){
+  const l = S.tim? S.nhatky.filter(n=>kd(n.join(" ")).includes(kd(S.tim))) : S.nhatky;
+  return `<div class="card"><table><thead><tr><th style="width:110px">Thời điểm</th><th style="width:130px">Người thực hiện</th><th style="width:280px">Hành động</th><th>Chi tiết</th></tr></thead>
+   ${l.map(n=>`<tr><td class="mono" style="font-size:12px;color:var(--ink3)">${n[0]}</td><td><b>${n[1]}</b></td><td>${n[2]}</td><td style="color:var(--ink2)">${n[3]}</td></tr>`).join("")}
+  </table></div>`;
+}
+/* ==================== MODULE MỚI 1: P&L KÊNH BÁN ==================== */
+
+const CHUTHICH_Q = `<div class="qlegend">
+  <span><span class="q q-r"></span>Đã đối soát với quyết toán</span>
+  <span><span class="q q-e"></span>Ước tính hoặc phân bổ</span>
+  <span><span class="q q-n"></span>Chưa có dữ liệu</span></div>`;
+
+function manPNL(){
+  const tabs = [["kenh","Thang biên lợi nhuận"],["ss","So sánh kênh"],["sku","SKU × Kênh"],["hn","Hợp nhất"]];
+  return `<div class="tabs">${tabs.map(([v,t])=>`<button class="${S.pnlTab===v?"on":""}" data-pnltab="${v}">${t}</button>`).join("")}</div>
+   ${S.pnlTab==="kenh"?pnlThang():S.pnlTab==="ss"?pnlSoSanh():S.pnlTab==="sku"?pnlSKU():pnlHopNhat()}`;
+}
+
+function pnlThang(){
+  const ks = pnlKenh(S.tid);
+  const cur = ks.find(k=>k.k===(S.pnlKenh||ks[0].k)) || ks[0];
+  const G = cur.gmv;
+  const bar = (v,cls)=>`<div class="rbar"><i class="${cls||""}${v<0?" neg":""}" style="width:${Math.min(Math.abs(v)/G*100,100)}%"></i></div>`;
+  const rung = (nhan,mo,q,gt,cls)=>`<div class="rung ${cls||""}">
+    <div class="rl">${q?qChip(q):""}${nhan}${mo?`<small>${mo}</small>`:""}</div>
+    ${bar(gt, cls==="ded"?"":"")}
+    <div class="rv" style="${gt<0?"color:var(--red)":""}">${vnd(gt)}</div>
+    <div class="rp">${pc(gt,G)}</div></div>`;
+  const tru = (nhan,gt,q,plus)=>`<div class="rung ded">
+    <div class="rl">${qChip(q)}${nhan}</div>
+    <div class="rbar"><i class="${plus?"plus":""}" style="width:${Math.min(Math.abs(gt)/G*100,100)}%"></i></div>
+    <div class="rv" style="${plus?"color:var(--grn)":""}">${plus?"+":"−"}${vnd(Math.abs(gt))}</div>
+    <div class="rp">${pc(Math.abs(gt),G)}</div></div>`;
+
+  const cogsThieu = cur.q.cogs==="n";
+  return `
+  <div style="display:flex;gap:9px;align-items:center;margin-bottom:13px;flex-wrap:wrap">
+    <div class="pills">${ks.map(k=>`<button class="${cur.k===k.k?"on":""}" data-pkenh="${k.k}">${k.ten}</button>`).join("")}</div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:11px">
+      ${CHUTHICH_Q}
+      <label style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink2)">
+        <button class="sw ${S.hienCM3?"on":""}" id="swCM3" aria-label="Hiện CM3"></button>Hiện CM3</label>
+    </div>
+  </div>
+
+  ${cogsThieu?`<div class="note" style="margin-bottom:13px"><span>⚠</span><div><b>Chưa lấy được giá vốn theo SKU cho ${kh().ten}.</b>
+    Mọi tầng từ lợi nhuận gộp trở lên chưa dựng được. Bảng dưới dừng ở doanh thu thuần và các khoản phí thu được từ quyết toán.
+    <a href="#" data-go="anhxa">Xem hồ sơ ánh xạ</a></div></div>`:""}
+
+  <div class="grid g4" style="margin-bottom:14px">
+    <div class="kpi"><div class="lb">GMV</div><div class="vl mono">${vnd(cur.gmv)}</div><div class="dt">Giá niêm yết trước mọi khoản giảm</div></div>
+    <div class="kpi"><div class="lb">Doanh thu thuần</div><div class="vl mono">${vnd(cur.dtt)}</div><div class="dt">${pc(cur.dtt,cur.gmv)} GMV</div></div>
+    <div class="kpi ${cur.cm1<0?"al":""}"><div class="lb">CM1</div><div class="vl mono">${cogsThieu?"—":vnd(cur.cm1)}</div><div class="dt">${cogsThieu?"cần giá vốn":pc(cur.cm1,cur.dtt)+" doanh thu thuần"}</div></div>
+    <div class="kpi ${cur.cm2<0?"al":"ok"}"><div class="lb">CM2</div><div class="vl mono">${cogsThieu?"—":vnd(cur.cm2)}</div><div class="dt">${cogsThieu?"cần giá vốn":pc(cur.cm2,cur.dtt)+" doanh thu thuần"}</div></div>
+  </div>
+
+  ${cur.cm2<0&&!cogsThieu?`<div class="note" style="margin-bottom:13px"><span>⚠</span><div>
+    <b>${cur.ten} âm ở tầng CM2 dù CM1 còn ${vnd(cur.cm1)}.</b>
+    Quảng cáo và hoa hồng affiliate cộng lại ${vnd(cur.ads+cur.aff)}, vượt toàn bộ biên đóng góp sau phí sàn.
+    Con số này chỉ hiện ra khi phí sàn được lấy từ bản ghi quyết toán thật thay vì biểu phí công bố.</div></div>`:""}
+
+  <div class="card"><h3>Thang biên lợi nhuận · ${cur.ten}<span class="r">${PNL[S.tid].ky}</span></h3><div class="pad">
+    <div class="ladder">
+      ${rung("GMV","Giá niêm yết nhân số lượng","r",cur.gmv,"tot")}
+      ${tru("Khuyến mãi người bán tài trợ", cur.kmBan, "r")}
+      ${cur.kmSan?tru("Trợ giá sàn tài trợ, được hoàn lại", cur.kmSan, cur.q.kmSan, true):""}
+      ${tru("Hoàn hàng và huỷ sau ghi nhận", cur.hoan, "r")}
+      ${rung("Doanh thu thuần","","r",cur.dtt,"tot")}
+      ${cogsThieu?`<div class="rung ded"><div class="rl">${qChip("n")}Giá vốn hàng bán</div><div class="rbar"></div><div class="rv">chưa có</div><div class="rp">—</div></div>`
+        :tru("Giá vốn hàng bán (landed cost)", cur.cogs, cur.q.cogs)}
+      ${cogsThieu?"":rung("Lợi nhuận gộp","",null,cur.lgop,"tot")}
+      ${tru("Hoa hồng sàn hoặc chiết khấu phân phối", cur.hh, "r")}
+      ${cur.ttoan?tru("Phí thanh toán", cur.ttoan, "r"):""}
+      ${cur.dvu?tru("Phí dịch vụ sàn", cur.dvu, "r"):""}
+      ${cur.xtra?tru("Phí gói Freeship Xtra và Voucher Xtra", cur.xtra, "r"):""}
+      ${tru("Cước vận chuyển người bán thực trả", cur.ship, "r")}
+      ${cur.thue?tru("Khấu trừ thuế tại nguồn", cur.thue, "r"):""}
+      ${cogsThieu?"":rung("CM1","Sau toàn bộ phí giao dịch",null,cur.cm1,"tot")}
+      ${tru("Quảng cáo trên kênh", cur.ads, cur.q.ads)}
+      ${cur.aff?tru("Hoa hồng affiliate, KOC, livestream", cur.aff, cur.q.aff):""}
+      ${cur.dgoi?tru("Vật tư đóng gói", cur.dgoi, cur.q.dgoi):""}
+      ${cogsThieu?"":rung("CM2","Sau chi phí biến đổi gắn với kênh",null,cur.cm2,"tot")}
+      ${S.hienCM3&&!cogsThieu?`
+        ${tru("Chi phí kho phân bổ", cur.kho, cur.q.kho)}
+        ${tru("Nhân sự vận hành kênh phân bổ", cur.ns, cur.q.ns)}
+        ${tru("Chi phí hệ thống phân bổ", cur.ht, cur.q.ht)}
+        ${rung("CM3","Sau chi phí phân bổ","e",cur.cm3,"tot")}`:""}
+    </div>
+  </div></div>
+
+  ${S.hienCM3?`<div class="note" style="margin-top:13px"><span>⚠</span><div>
+    <b>Ba dòng CM3 là số phân bổ, không phải số đo.</b> Quy tắc đang dùng: kho theo số đơn, nhân sự theo giờ khai báo, hệ thống theo tỷ trọng doanh thu thuần.
+    Phòng tài chính của khách có thể đang dùng quy tắc khác và ra con số khác; khi trình bày phải nói rõ quy tắc trước, không nói con số trước.
+    OPSCORE không có tầng lợi nhuận trước thuế theo kênh.</div></div>`:
+   `<div class="note stl" style="margin-top:13px"><span>ℹ</span><div>
+    Mặc định dừng ở CM2. Từ CM3 trở lên là số phân bổ theo quy tắc do khách khai, không truy được về giao dịch gốc.</div></div>`}`;
+}
+
+function pnlSoSanh(){
+  const ks = pnlKenh(S.tid), tg = pnlTong(S.tid);
+  const cot = [["gmv","GMV"],["dtt","Doanh thu thuần"],["lgop","Lợi nhuận gộp"],["cm1","CM1"],["cm2","CM2"]];
+  if(S.hienCM3) cot.push(["cm3","CM3"]);
+  return `
+  <div style="display:flex;align-items:center;gap:11px;margin-bottom:13px">
+    ${CHUTHICH_Q}
+    <label style="margin-left:auto;display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink2)">
+      <button class="sw ${S.hienCM3?"on":""}" id="swCM3" aria-label="Hiện CM3"></button>Hiện CM3</label></div>
+  <div class="card" style="margin-bottom:14px"><h3>Sáu tầng theo từng kênh<span class="r">${PNL[S.tid].ky} · đơn vị tỷ đồng</span></h3><table>
+   <thead><tr><th>Tầng</th>${ks.map(k=>`<th class="num">${k.ten}</th>`).join("")}<th class="num" style="background:var(--steel-soft)">Tổng</th></tr></thead>
+   ${cot.map(([f,t])=>`<tr><td><b>${t}</b></td>
+     ${ks.map(k=>`<td class="num mono" style="${k[f]<0?"color:var(--red);font-weight:600":""}">${k.q.cogs==="n"&&["lgop","cm1","cm2","cm3"].includes(f)?"—":vnd(k[f])}</td>`).join("")}
+     <td class="num mono" style="background:#FAFAF8;font-weight:600;${tg[f]<0?"color:var(--red)":""}">${vnd(tg[f])}</td></tr>`).join("")}
+   <tr style="background:#FAFAF8"><td style="color:var(--ink3)">CM1 trên doanh thu thuần</td>
+     ${ks.map(k=>`<td class="num mono" style="font-size:12px;color:var(--ink3)">${pc(k.cm1,k.dtt)}</td>`).join("")}
+     <td class="num mono" style="font-size:12px;color:var(--ink3)">${pc(tg.cm1,tg.dtt)}</td></tr>
+   <tr style="background:#FAFAF8"><td style="color:var(--ink3)">CM2 trên doanh thu thuần</td>
+     ${ks.map(k=>`<td class="num mono" style="font-size:12px;color:${k.cm2<0?"var(--red)":"var(--ink3)"}">${pc(k.cm2,k.dtt)}</td>`).join("")}
+     <td class="num mono" style="font-size:12px;color:var(--ink3)">${pc(tg.cm2,tg.dtt)}</td></tr>
+  </table></div>
+  <div class="card"><h3>Cấu trúc phí theo kênh<span class="r">tỷ trọng trên doanh thu thuần</span></h3><table>
+   <thead><tr><th>Khoản</th>${ks.map(k=>`<th class="num">${k.ten}</th>`).join("")}</tr></thead>
+   ${[["hh","Hoa hồng hoặc chiết khấu"],["ttoan","Phí thanh toán"],["dvu","Phí dịch vụ"],["xtra","Gói Freeship và Voucher Xtra"],["ship","Vận chuyển thực trả"],["thue","Thuế khấu trừ tại nguồn"],["ads","Quảng cáo"],["aff","Affiliate và KOC"]]
+     .map(([f,t])=>`<tr><td>${t}</td>${ks.map(k=>{const v=k[f]/k.dtt*100;
+       return `<td class="num mono" style="color:${v>12?"var(--red)":v>7?"var(--amb)":"var(--ink2)"}">${k[f]?v.toFixed(1)+"%":"—"}</td>`;}).join("")}</tr>`).join("")}
+  </table></div>`;
+}
+
+function pnlSKU(){
+  const ks = pnlKenh(S.tid), skus = SKU[S.tid]||[];
+  const kcol = ks.map(k=>k.k);
+  const rows = [];
+  skus.forEach(s=>{
+    kcol.forEach(kk=>{
+      const d = s.kenh[kk]; if(!d||!d.sl) return;
+      const f = PHI_KENH[kk];
+      const dt = d.sl*d.giaTb*(1-f.hoanTb);
+      const cogs = d.sl*s.giaVon*(1-f.hoanTb);
+      const phi = dt*(f.hh+f.ttoan+f.xtra) + d.sl*f.shipTb;
+      const cm1 = dt - cogs - phi;
+      const bienDv = d.giaTb*(1-f.hh-f.ttoan-f.xtra) - s.giaVon - f.shipTb;
+      rows.push({sku:s.sku, ten:s.ten, kenh:kk, kten:ks.find(x=>x.k===kk).ten, sl:d.sl, giaTb:d.giaTb, giaVon:s.giaVon, dt, cm1, tl:cm1/dt*100, bienDv});
+    });
+  });
+  const duoiVon = rows.filter(r=>r.bienDv<0);
+  let hien = rows.slice();
+  if(S.skuLoc==="am") hien = duoiVon;
+  if(S.tim) hien = hien.filter(r=>kd(r.sku+r.ten+r.kten).includes(kd(S.tim)));
+  hien.sort((a,b)=>a.tl-b.tl);
+  return `
+  ${duoiVon.length?`<div class="note" style="margin-bottom:13px"><span>⚠</span><div>
+    <b>${duoiVon.length} tổ hợp mã hàng và kênh đang bán dưới giá vốn</b> sau khi trừ hoa hồng, phí thanh toán, phí gói Xtra và cước vận chuyển thực trả.
+    Tổng doanh thu của nhóm này là ${vnd(duoiVon.reduce((a,b)=>a+b.dt,0))} trong kỳ.
+    Đây là lát cắt mà báo cáo theo kênh không nhìn thấy, vì ở tầng kênh các mã lãi bù cho các mã lỗ.</div></div>`:""}
+  <div style="display:flex;gap:9px;align-items:center;margin-bottom:13px">
+    <div class="pills">
+      <button class="${S.skuLoc!=="am"?"on":""}" data-skuloc="all">Tất cả ${rows.length} tổ hợp</button>
+      <button class="${S.skuLoc==="am"?"on":""}" data-skuloc="am">Dưới giá vốn ${duoiVon.length}</button></div>
+    <div style="margin-left:auto;font-size:12px;color:var(--ink3)">Sắp xếp theo biên CM1 tăng dần</div></div>
+  <div class="card"><table>
+   <thead><tr><th style="width:118px">Mã hàng</th><th>Tên</th><th style="width:104px">Kênh</th>
+     <th class="num">Số lượng</th><th class="num">Giá bán TB</th><th class="num">Giá vốn</th>
+     <th class="num">Doanh thu</th><th class="num">CM1</th><th class="num" style="width:74px">Biên</th></tr></thead>
+   ${hien.length?hien.map(r=>`<tr style="${r.bienDv<0?"background:var(--red-soft)":""}">
+     <td class="mono" style="font-size:12px">${r.sku}</td>
+     <td>${r.ten}${r.bienDv<0?` <span class="chip c-red">âm ${vnd(Math.abs(r.bienDv)*r.sl)}</span>`:""}</td>
+     <td>${r.kten}</td>
+     <td class="num mono">${r.sl.toLocaleString("vi-VN")}</td>
+     <td class="num mono">${Math.round(r.giaTb/1000)}k</td>
+     <td class="num mono" style="color:var(--ink3)">${Math.round(r.giaVon/1000)}k</td>
+     <td class="num mono">${vnd(r.dt)}</td>
+     <td class="num mono" style="${r.cm1<0?"color:var(--red);font-weight:600":""}">${vnd(r.cm1)}</td>
+     <td class="num mono" style="${r.tl<0?"color:var(--red);font-weight:600":r.tl<10?"color:var(--amb)":""}">${r.tl.toFixed(1)}%</td></tr>`).join("")
+    :`<tr><td colspan="9"><div class="empty"><b>Không có tổ hợp nào khớp</b>Xoá từ khoá tìm kiếm hoặc đổi bộ lọc.</div></td></tr>`}
+  </table></div>`;
+}
+
+function pnlHopNhat(){
+  const ks = pnlKenh(S.tid), tg = pnlTong(S.tid), cc = PNL[S.tid].chungChua;
+  const chung = cc.brand + cc.gna;
+  const sau = tg.cm2 - chung;
+  const maxCM = Math.max(...ks.map(k=>Math.abs(k.cm2)),1);
+  return `
+  <div class="grid g4" style="margin-bottom:14px">
+    <div class="kpi"><div class="lb">GMV toàn bộ kênh</div><div class="vl mono">${vnd(tg.gmv)}</div><div class="dt">${ks.length} kênh đang hoạt động</div></div>
+    <div class="kpi"><div class="lb">Doanh thu thuần hợp nhất</div><div class="vl mono">${vnd(tg.dtt)}</div><div class="dt">${pc(tg.dtt,tg.gmv)} GMV</div></div>
+    <div class="kpi ok"><div class="lb">CM2 hợp nhất</div><div class="vl mono">${vnd(tg.cm2)}</div><div class="dt">${pc(tg.cm2,tg.dtt)} doanh thu thuần</div></div>
+    <div class="kpi ${sau<0?"al":""}"><div class="lb">Sau chi phí dùng chung</div><div class="vl mono">${vnd(sau)}</div><div class="dt">chưa phân bổ về kênh nào</div></div>
+  </div>
+  <div class="grid g2" style="margin-bottom:14px">
+    <div class="card"><h3>Đóng góp CM2 theo kênh</h3><div class="pad">
+      ${ks.map(k=>`<div style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px">
+          <span><b>${k.ten}</b> <span style="color:var(--ink3)">· ${pc(k.dtt,tg.dtt)} doanh thu</span></span>
+          <b class="mono" style="${k.cm2<0?"color:var(--red)":""}">${vnd(k.cm2)}</b></div>
+        <div class="bar"><i style="width:${Math.abs(k.cm2)/maxCM*100}%;background:${k.cm2<0?"var(--red)":"var(--steel)"}"></i></div></div>`).join("")}
+    </div></div>
+    <div class="card"><h3>Rổ chi phí dùng chung<span class="r">để nguyên, không phân bổ</span></h3><div class="pad">
+      <table style="font-size:13px">
+        <tr><td>Marketing thương hiệu</td><td class="num mono">${vnd(cc.brand)}</td></tr>
+        <tr><td>Quản lý và điều hành</td><td class="num mono">${vnd(cc.gna)}</td></tr>
+        <tr style="background:#FAFAF8"><td><b>Tổng</b></td><td class="num mono"><b>${vnd(chung)}</b></td></tr>
+      </table>
+      <div class="note" style="margin-top:12px"><span>ℹ</span><div>
+        Hai khoản này nâng nhiều kênh cùng lúc và không quy về kênh nào một cách trung thực được.
+        OPSCORE để nguyên thay vì chia theo doanh thu, vì chia theo doanh thu sẽ làm kênh lớn nhất trông xấu đi một cách giả tạo.</div></div>
+    </div></div>
+  </div>
+  <div class="card"><h3>Bốn điểm cần khai báo trước khi tin con số hợp nhất</h3><table>
+    <thead><tr><th style="width:210px">Tình huống</th><th>Quy tắc đang áp dụng</th><th style="width:104px">Nguồn quy tắc</th></tr></thead>
+    <tr><td><b>Tồn kho dùng chung</b></td><td>Đơn bị huỷ do hết hàng ghi về kênh phát sinh đơn, không ghi về kênh đã bán hết tồn</td><td><span class="chip c-amb">Khách khai</span></td></tr>
+    <tr><td><b>Marketing thương hiệu</b></td><td>Không phân bổ, để riêng ở rổ chi phí dùng chung</td><td><span class="chip c-stl">Mặc định</span></td></tr>
+    <tr><td><b>Một mã nhiều giá niêm yết</b></td><td>Hợp nhất theo mã sản phẩm chuẩn hoá, không theo mã niêm yết trên từng kênh</td><td><span class="chip c-stl">Mặc định</span></td></tr>
+    <tr><td><b>Hoàn hàng chéo kênh</b></td><td>Doanh thu ghi ở kênh phát sinh đơn, khoản hoàn trừ vào đúng kênh đó dù trả tại cửa hàng</td><td><span class="chip c-amb">Khách khai</span></td></tr>
+  </table></div>`;
+}
+
+/* ==================== MODULE MỚI 2: DỰ BÁO ==================== */
+function manDuBao(){
+  const tabs = [["tien","Dòng tiền quyết toán"],["mp","Mô phỏng kịch bản"],["hoan","Tỷ lệ hoàn"],["dt","Doanh thu"]];
+  return `<div class="tabs">${tabs.map(([v,t])=>`<button class="${S.dbTab===v?"on":""}" data-dbtab="${v}">${t}</button>`).join("")}</div>
+   ${S.dbTab==="tien"?dbTien():S.dbTab==="mp"?dbMoPhong():S.dbTab==="hoan"?dbHoan():dbDoanhThu()}`;
+}
+
+function dbTien(){
+  const d = duBaoDongTien(S.tid);
+  const max = Math.max(...d.map(x=>x.tong));
+  const t7 = d.slice(0,7), t14=d.slice(0,14), t30=d;
+  const sum = a=>a.reduce((x,y)=>x+y.tong,0);
+  const ks = pnlKenh(S.tid).filter(k=>k.k!=="gtmt");
+  const hk = HAUKIEM[S.tid]||[];
+  const mae = hk.length? (hk.reduce((a,b)=>a+Math.abs(b.sl),0)/hk.length).toFixed(1) : null;
+  return `
+  <div class="note stl" style="margin-bottom:14px"><span>ℹ</span><div>
+    <b>Đây là số học, không phải mô hình thống kê.</b> Đơn đã phát sinh thì đã biết, biểu phí đã mã hoá trong thư viện quy tắc, chu kỳ quyết toán từng sàn đã biết.
+    Biến ngẫu nhiên duy nhất là tỷ lệ hoàn, và nó được tách riêng thành dải rủi ro. Dự báo này không cần giá vốn nên chạy được ngay cả khi P&amp;L chưa dựng xong.</div></div>
+
+  <div class="grid g4" style="margin-bottom:14px">
+    <div class="kpi"><div class="lb">7 ngày tới</div><div class="vl mono">${vnd(sum(t7))}</div><div class="dt">phần lớn đã được sàn chốt</div></div>
+    <div class="kpi"><div class="lb">14 ngày tới</div><div class="vl mono">${vnd(sum(t14))}</div><div class="dt">gồm phần tính từ biểu phí</div></div>
+    <div class="kpi"><div class="lb">30 ngày tới</div><div class="vl mono">${vnd(sum(t30))}</div><div class="dt">khoảng ${vnd(sum(t30)*0.94)} đến ${vnd(sum(t30)*1.05)}</div></div>
+    <div class="kpi ${mae&&mae>5?"al":"ok"}"><div class="lb">Sai số trung bình các kỳ trước</div><div class="vl mono">${mae?"±"+mae+"%":"—"}</div><div class="dt">${hk.length} kỳ đã hậu kiểm</div></div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px"><h3>Tiền sàn chuyển về theo ngày<span class="r">11/09 đến 10/10/2026</span></h3><div class="pad">
+    <div class="cal">${d.map(x=>`<div class="d">
+      <div class="tip">${String(x.ngay.getDate()).padStart(2,"0")}/${String(x.ngay.getMonth()+1).padStart(2,"0")} · tổng ${vnd(x.tong)}<br>đã chốt ${vnd(x.chot)} · dự kiến ${vnd(x.dukien)} · rủi ro hoàn ${vnd(x.ruiro)}</div>
+      <div class="st s3" style="height:${x.ruiro/max*118}px"></div>
+      <div class="st s2" style="height:${x.dukien/max*118}px"></div>
+      <div class="st s1" style="height:${x.chot/max*118}px"></div>
+      <div class="lb">${x.ngay.getDate()}</div></div>`).join("")}</div>
+    <div class="qlegend" style="margin-top:13px">
+      <span><span class="q" style="background:var(--steel)"></span>Sàn đã chốt số</span>
+      <span><span class="q" style="background:#7FA3C4"></span>Tính từ biểu phí đã đối soát</span>
+      <span><span class="q" style="background:var(--amb-line)"></span>Có thể mất do hoàn hàng</span></div>
+  </div></div>
+
+  <div class="grid g2">
+    <div class="card"><h3>Phân rã theo kênh<span class="r">30 ngày tới</span></h3><table>
+      <thead><tr><th>Kênh</th><th>Chu kỳ</th><th class="num">Đơn đang trên đường</th><th class="num">Dự kiến về</th></tr></thead>
+      ${ks.map((k,i)=>{const ph = [0.42,0.31,0.19,0.08][i]||0.05;
+        return `<tr><td><b>${k.ten}</b></td><td class="mono" style="font-size:12px">${CHUKY_QT[k.k]}</td>
+        <td class="num mono">${Math.round(k.dtt/280000).toLocaleString("vi-VN")}</td>
+        <td class="num mono"><b>${vnd(sum(t30)*ph)}</b></td></tr>`;}).join("")}
+    </table></div>
+    <div class="card"><h3>Hậu kiểm: dự báo so với thực tế<span class="r">bắt buộc hiện, không được ẩn</span></h3><div class="pad">
+      ${hk.length?`<div class="bt">${hk.map(h=>`<div class="c ${Math.abs(h.sl)<2.5?"good":Math.abs(h.sl)>5?"bad":""}">
+        <div class="p">${h.ky}</div><div class="e">${h.sl>0?"+":""}${h.sl}%</div></div>`).join("")}</div>
+      <div style="font-size:12.5px;color:var(--ink2);margin-top:12px">
+        Số dương là dự báo cao hơn thực tế. Sai số thu hẹp dần khi độ phủ ánh xạ tăng: ${kh().ten} hiện ở ${kh().covMap}%.</div>`
+      :`<div class="empty"><b>Chưa có kỳ nào để hậu kiểm</b>Cần ít nhất một chu kỳ quyết toán hoàn chỉnh sau khi go-live.</div>`}
+    </div></div>
+  </div>`;
+}
+
+function dbMoPhong(){
+  const sim = S.sim, skus = SKU[S.tid]||[], f0 = PHI_KENH[sim.kenh];
+  const kten = (pnlKenh(S.tid).find(k=>k.k===sim.kenh)||{ten:sim.kenh}).ten;
+  const laSan = sim.kenh!=="web" && sim.kenh!=="gtmt";
+  const co = sim.co===undefined ? 1.8 : sim.co;
+
+  function chay(giam, xtra, vou, adsP, affP, nhanSL){
+    const xr = (xtra?0.048:0) + (vou?0.031:0);
+    let gmv=0, dt=0, cogs=0, phi=0, ads=0, aff=0, am=0, amDt=0; const ct=[];
+    skus.forEach(s=>{
+      const d = s.kenh[sim.kenh]; if(!d||!d.sl) return;
+      const sl = Math.round(d.sl*nhanSL);
+      const gia = d.giaTb*(1-giam/100);
+      const r = sl*gia*(1-f0.hoanTb);
+      const c = sl*s.giaVon*(1-f0.hoanTb);
+      const p = r*(f0.hh+f0.ttoan+xr) + sl*f0.shipTb;
+      const a = r*(adsP/100), af = r*(affP/100);
+      const bienDv = gia*(1-f0.hh-f0.ttoan-xr) - s.giaVon - f0.shipTb;
+      gmv+=sl*d.giaTb; dt+=r; cogs+=c; phi+=p; ads+=a; aff+=af;
+      if(bienDv<0){ am++; amDt+=r; }
+      ct.push({sku:s.sku, ten:s.ten, sl, gia, bienDv, cm1:r-c-p});
+    });
+    return {gmv, dt, cogs, phi, ads, aff, am, amDt, cm1:dt-cogs-phi, cm2:dt-cogs-phi-ads-aff, ct};
+  }
+
+  /* nền: rổ mã hàng này ở mức chiết khấu 0, giữ nguyên mức tham gia gói và chi tiêu như kỳ gốc */
+  const nen = chay(0, laSan, laSan, 8, laSan?10:0, 1);
+  const nhan = 1 + (sim.giam/100)*co + (sim.xtra?0.22:0) + (sim.voucher?0.14:0) + (sim.ads/100)*1.1;
+  const kb  = chay(sim.giam, sim.xtra, sim.voucher, sim.ads, sim.aff, nhan);
+  kb.ct.sort((a,b)=>a.bienDv-b.bienDv);
+
+  const dl = (a,b)=>{ const v=a-b; return `<span style="color:${v<0?"var(--red)":"var(--grn)"}">${v>=0?"+":"−"}${vnd(Math.abs(v))}</span>`; };
+
+  return `
+  <div class="note stl" style="margin-bottom:14px"><span>ℹ</span><div>
+    <b>Chạy ngược thư viện quy tắc phí lên rổ ${skus.length} mã hàng chủ lực của kênh ${kten}.</b>
+    Không phải dự báo nhu cầu nên không có sai số kiểu dự báo: chỉ sai nếu biểu phí mã hoá sai, mà biểu phí đã được đối soát với quyết toán thật ở tab dòng tiền.
+    Mốc so sánh là chính rổ mã hàng này ở mức chiết khấu 0, không phải số kỳ gốc của cả kênh.
+    Hệ số co giãn sản lượng là giả định của người dùng, chỉnh được ở thanh trượt cuối.</div></div>
+  <div class="sim">
+    <div>
+      <div class="simc" style="margin-bottom:12px">
+        <h4>Kênh</h4>
+        <div class="fld" style="margin-bottom:0"><select id="simKenh">${pnlKenh(S.tid).map(k=>
+          `<option value="${k.k}" ${sim.kenh===k.k?"selected":""}>${k.ten}</option>`).join("")}</select></div>
+      </div>
+      <div class="simc" style="margin-bottom:12px">
+        <h4>Mức giảm và chi tiêu</h4>
+        <div class="rng"><label>Giảm thêm</label><input type="range" id="rGiam" min="0" max="50" value="${sim.giam}"><span class="v">${sim.giam}%</span></div>
+        <div class="rng"><label>Quảng cáo</label><input type="range" id="rAds" min="0" max="30" value="${sim.ads}"><span class="v">${sim.ads}%</span></div>
+        <div class="rng"><label>Affiliate, KOC</label><input type="range" id="rAff" min="0" max="35" value="${sim.aff}"><span class="v">${sim.aff}%</span></div>
+      </div>
+      <div class="simc" style="margin-bottom:12px">
+        <h4>Gói tham gia của sàn</h4>
+        <div class="tog"><div><span>Freeship Xtra</span><small>phí 4,8% trên doanh thu</small></div>
+          <button class="sw ${sim.xtra?"on":""}" id="tXtra" aria-label="Freeship Xtra"></button></div>
+        <div class="tog"><div><span>Voucher Xtra</span><small>phí 3,1% trên doanh thu</small></div>
+          <button class="sw ${sim.voucher?"on":""}" id="tVou" aria-label="Voucher Xtra"></button></div>
+      </div>
+      <div class="simc">
+        <h4>Giả định của người dùng</h4>
+        <div class="rng"><label>Hệ số co giãn</label><input type="range" id="rCo" min="0" max="40" value="${Math.round(co*10)}"><span class="v">${co.toFixed(1)}</span></div>
+        <div style="font-size:11.5px;color:var(--ink3);border-top:1px solid var(--line2);padding-top:9px">
+          Giảm 1% giá làm sản lượng tăng ${co.toFixed(1)}%. Sản lượng kịch bản bằng <b class="mono">${nhan.toFixed(2)}</b> lần mức nền.
+          Đây là con số duy nhất trên màn hình này không lấy từ dữ liệu đối soát.</div>
+      </div>
+    </div>
+    <div>
+      <div class="grid g3" style="margin-bottom:13px">
+        <div class="kpi"><div class="lb">GMV rổ mã hàng</div><div class="vl mono">${vnd(kb.gmv)}</div>
+          <div class="dt">nền ${vnd(nen.gmv)} · ${dl(kb.gmv,nen.gmv)}</div></div>
+        <div class="kpi ${kb.cm1<0?"al":""}"><div class="lb">CM1</div><div class="vl mono">${vnd(kb.cm1)}</div>
+          <div class="dt">nền ${vnd(nen.cm1)} · ${dl(kb.cm1,nen.cm1)}</div></div>
+        <div class="kpi ${kb.cm2<0?"al":"ok"}"><div class="lb">CM2</div><div class="vl mono">${vnd(kb.cm2)}</div>
+          <div class="dt">nền ${vnd(nen.cm2)} · ${dl(kb.cm2,nen.cm2)}</div></div>
+      </div>
+      ${kb.cm2<nen.cm2 && kb.gmv>nen.gmv?`<div class="note" style="margin-bottom:13px"><span>⚠</span><div>
+        <b>GMV tăng ${vnd(kb.gmv-nen.gmv)} nhưng CM2 giảm ${vnd(nen.cm2-kb.cm2)}.</b>
+        Đây là dạng kịch bản mà báo cáo doanh thu khen còn báo cáo lợi nhuận chê, và thường chỉ lộ ra sau khi sàn quyết toán xong ba tuần sau chiến dịch.</div></div>`:""}
+      ${kb.am?`<div class="note" style="margin-bottom:13px"><span>⚠</span><div>
+        <b>${kb.am} trong ${skus.length} mã hàng sẽ bán dưới giá vốn ở kịch bản này</b>, chiếm ${vnd(kb.amDt)} doanh thu${nen.am?` (mức nền: ${nen.am} mã)`:""}.
+        ${sim.xtra||sim.voucher?"Phí gói Xtra cộng thẳng vào tỷ lệ phí trên từng đơn, không phải chi phí cố định theo tháng, nên nó đẩy các mã giá thấp xuống dưới giá vốn trước tiên.":"Nguyên nhân đến từ mức giảm giá chồng lên hoa hồng sàn và cước vận chuyển thực trả."}</div></div>`:
+        `<div class="note stl" style="margin-bottom:13px"><span>✓</span><div>Không mã nào rơi xuống dưới giá vốn ở kịch bản này.</div></div>`}
+      <div class="card"><h3>Biên trên từng đơn vị sản phẩm<span class="r">sắp xếp từ thấp lên</span></h3><table>
+        <thead><tr><th>Mã hàng</th><th>Tên</th><th class="num">Giá sau giảm</th><th class="num">Sản lượng</th><th class="num">Biên mỗi đơn vị</th><th class="num">CM1</th></tr></thead>
+        ${kb.ct.map(r=>`<tr style="${r.bienDv<0?"background:var(--red-soft)":""}">
+          <td class="mono" style="font-size:12px">${r.sku}</td><td>${r.ten}</td>
+          <td class="num mono">${Math.round(r.gia/1000)}k</td>
+          <td class="num mono">${r.sl.toLocaleString("vi-VN")}</td>
+          <td class="num mono" style="${r.bienDv<0?"color:var(--red);font-weight:600":""}">${r.bienDv<0?"−":""}${Math.round(Math.abs(r.bienDv)/1000)}k</td>
+          <td class="num mono" style="${r.cm1<0?"color:var(--red)":""}">${vnd(r.cm1)}</td></tr>`).join("")}
+      </table></div>
+    </div>
+  </div>`;
+}
+
+function dbHoan(){
+  const ks = pnlKenh(S.tid);
+  return `<div class="note stl" style="margin-bottom:14px"><span>ℹ</span><div>
+    <b>Đây là dự báo thống kê thật, phạm vi hẹp.</b> Cần cho hai tab trước chính xác, vì tỷ lệ hoàn là biến ngẫu nhiên duy nhất trong dự báo dòng tiền.
+    Mô hình dùng 90 ngày gần nhất theo từng kênh và từng nhóm hàng, kiểm chứng lại sau mỗi kỳ.</div></div>
+  <div class="card" style="margin-bottom:14px"><h3>Tỷ lệ hoàn theo kênh<span class="r">thực tế 90 ngày so với dự báo 30 ngày tới</span></h3><table>
+    <thead><tr><th>Kênh</th><th class="num">Thực tế 90 ngày</th><th class="num">Dự báo 30 ngày</th><th class="num">Khoảng tin cậy 80%</th><th class="num">Giá trị rủi ro</th></tr></thead>
+    ${ks.map(k=>{const tt=k.hoan/(k.gmv-k.kmBan)*100, db=tt*(0.94+(k.k.length%3)*0.05);
+      return `<tr><td><b>${k.ten}</b></td><td class="num mono">${tt.toFixed(1)}%</td>
+      <td class="num mono"><b>${db.toFixed(1)}%</b></td>
+      <td class="num mono" style="color:var(--ink3)">${(db*0.82).toFixed(1)}% – ${(db*1.21).toFixed(1)}%</td>
+      <td class="num mono">${vnd(k.dtt*db/100)}</td></tr>`;}).join("")}
+  </table></div>
+  <div class="note"><span>⚠</span><div>
+    <b>TikTok Shop có tỷ lệ hoàn cao gấp nhiều lần các kênh khác</b> do đặc thù đơn phát sinh từ phát trực tiếp.
+    Nếu dự báo dòng tiền dùng một tỷ lệ hoàn chung cho mọi kênh thì con số cho TikTok Shop sẽ sai lệch nặng nhất, và đó là kênh có chu kỳ quyết toán ngắn nhất.</div></div>`;
+}
+
+function dbDoanhThu(){
+  return `<div class="note" style="margin-bottom:14px"><span>⚠</span><div>
+    <b>Chức năng này đang tắt theo mặc định, và tôi khuyến nghị để nguyên như vậy.</b>
+    Dự báo doanh thu là loại dự báo sai số lớn nhất, cạnh tranh đông nhất và khác biệt ít nhất trong bốn loại ở module này.
+    Quan trọng hơn: một con số đối soát sai là lỗi kỹ thuật sửa được, còn một con số dự báo doanh thu sai làm người dùng mất tin vào toàn bộ sản phẩm, kể cả các phần đang đúng.</div></div>
+  <div class="card"><div class="empty">
+    <b>Chưa bật dự báo doanh thu</b>
+    <div style="max-width:520px;margin:0 auto;text-align:left;font-size:13px;color:var(--ink2)">
+      <p style="margin:14px 0 8px">Ba điều kiện cần đạt trước khi bật:</p>
+      <p style="margin:0 0 7px">Sai số hậu kiểm của dự báo dòng tiền dưới 3% trong sáu kỳ liên tiếp. Nếu phần số học còn sai thì phần thống kê chắc chắn sai hơn.</p>
+      <p style="margin:0 0 7px">Ít nhất mười tám tháng dữ liệu liên tục cho mỗi kênh, đủ để tách mùa vụ ngày đôi ra khỏi xu hướng nền.</p>
+      <p style="margin:0 0 7px">Khách hàng yêu cầu bằng văn bản và chấp nhận rằng con số này không dùng để lập kế hoạch tài chính.</p>
+      <p style="margin:14px 0 0;color:var(--ink3)">Mùa vụ thương mại điện tử Việt Nam với các ngày đôi, phát trực tiếp và thay đổi thuật toán của sàn khiến mô hình chuỗi thời gian thông thường có sai số cao hơn nhiều so với thị trường khác.</p>
+    </div>
+  </div></div>`;
+}
+/* ==================== THAO TÁC ==================== */
+function gan(){
+  const t = $("#selTenant");
+  if(t) t.onchange = e => { S.tid=e.target.value; S.caseId=null; S.pnlKenh=null; S.tim=""; ve(); };
+
+  document.querySelectorAll("[data-man]").forEach(b=> b.onclick = ()=>{ S.man=b.dataset.man; S.caseId=null; S.tim=""; ve(); });
+  document.querySelectorAll("[data-go]").forEach(a=> a.onclick = e=>{ e.preventDefault(); S.man=a.dataset.go; S.caseId=null; ve(); });
+  document.querySelectorAll("[data-case]").forEach(r=> r.onclick = ()=>{ S.man="case"; S.caseId=r.dataset.case; ve(); });
+  document.querySelectorAll("[data-back]").forEach(a=> a.onclick = e=>{ e.preventDefault(); S.caseId=null; ve(); });
+  document.querySelectorAll("[data-loctt]").forEach(b=> b.onclick = ()=>{ S.locTT=b.dataset.loctt; ve(); });
+  document.querySelectorAll("[data-locnhom]").forEach(b=> b.onclick = ()=>{ S.locNhom=b.dataset.locnhom; ve(); });
+  document.querySelectorAll("[data-pnltab]").forEach(b=> b.onclick = ()=>{ S.pnlTab=b.dataset.pnltab; S.tim=""; ve(); });
+  document.querySelectorAll("[data-dbtab]").forEach(b=> b.onclick = ()=>{ S.dbTab=b.dataset.dbtab; ve(); });
+  document.querySelectorAll("[data-pkenh]").forEach(b=> b.onclick = ()=>{ S.pnlKenh=b.dataset.pkenh; ve(); });
+  document.querySelectorAll("[data-skuloc]").forEach(b=> b.onclick = ()=>{ S.skuLoc=b.dataset.skuloc; ve(); });
+
+  const sw3 = $("#swCM3"); if(sw3) sw3.onclick = ()=>{ S.hienCM3=!S.hienCM3; ve(); };
+  const sel = $("#selSap"); if(sel) sel.onchange = e=>{ S.sapXep=e.target.value; ve(); };
+
+  document.querySelectorAll("[data-qt]").forEach(b=> b.onclick = ()=>{
+    const q = S.quyTac.find(x=>x.ma===b.dataset.qt); q.bat=!q.bat;
+    ghiNhatKy("Hiệp", (q.bat?"Bật":"Tắt")+" quy tắc "+q.ma, q.ten);
+    toast((q.bat?"Đã bật ":"Đã tắt ")+q.ma); ve(); });
+
+  document.querySelectorAll("[data-duyet]").forEach(b=> b.onclick = ()=>{
+    const a = S.duyet.find(x=>x.ma===b.dataset.duyet);
+    if(!a.quaylui && !confirm(`Yêu cầu ${a.ma} không quay lui được sau khi thực thi.\n\n${a.hq}\n\nXác nhận phê duyệt?`)) return;
+    S.duyet = S.duyet.filter(x=>x.ma!==a.ma);
+    ghiNhatKy("Hiệp","Phê duyệt "+a.ma, a.lenh+" trên "+a.he);
+    toast("Đã thực thi "+a.ma); ve(); });
+
+  document.querySelectorAll("[data-tuchoi]").forEach(b=> b.onclick = ()=>{
+    const a = S.duyet.find(x=>x.ma===b.dataset.tuchoi);
+    const ly = prompt("Lý do từ chối "+a.ma+":"); if(ly===null) return;
+    S.duyet = S.duyet.filter(x=>x.ma!==a.ma);
+    ghiNhatKy("Hiệp","Từ chối "+a.ma, ly||"không nêu lý do");
+    toast("Đã từ chối "+a.ma); ve(); });
+
+  document.querySelectorAll("[data-dong]").forEach(b=> b.onclick = ()=>{
+    const c = S.cases[S.tid].find(x=>x.ma===b.dataset.dong); c.tt="dong";
+    ghiNhatKy("Dũng","Đóng trường hợp "+c.ma, c.tien?("Ghi nhận thu hồi "+vnd(c.tien)):"Không phát sinh thu hồi");
+    toast("Đã đóng "+c.ma); S.caseId=null; ve(); });
+  document.querySelectorAll("[data-mo]").forEach(b=> b.onclick = ()=>{
+    const c = S.cases[S.tid].find(x=>x.ma===b.dataset.mo); c.tt="mo";
+    ghiNhatKy("Dũng","Mở lại trường hợp "+c.ma,"Chuyển về trạng thái đang mở"); ve(); });
+  document.querySelectorAll("[data-giao]").forEach(b=> b.onclick = ()=>{
+    const c = S.cases[S.tid].find(x=>x.ma===b.dataset.giao);
+    const bp = prompt("Giao "+c.ma+" cho bộ phận nào?", c.pt); if(!bp) return;
+    c.pt = bp; ghiNhatKy("Dũng","Giao "+c.ma+" cho "+bp, c.td);
+    toast("Đã giao cho "+bp); ve(); });
+
+  /* mô phỏng: cập nhật tại chỗ, không dựng lại cả trang */
+  const bind = (id,key,mx)=>{ const el=$(id); if(!el) return;
+    el.oninput = e=>{ S.sim[key]=+e.target.value; capNhatSim(); }; };
+  bind("#rGiam","giam"); bind("#rAds","ads"); bind("#rAff","aff");
+  const rc=$("#rCo"); if(rc) rc.oninput = e=>{ S.sim.co=(+e.target.value)/10; capNhatSim(); };
+  const sk = $("#simKenh"); if(sk) sk.onchange = e=>{ S.sim.kenh=e.target.value; ve(); };
+  const tx = $("#tXtra"); if(tx) tx.onclick = ()=>{ S.sim.xtra=!S.sim.xtra; ve(); };
+  const tv = $("#tVou"); if(tv) tv.onclick = ()=>{ S.sim.voucher=!S.sim.voucher; ve(); };
+
+  const o = $("#oTim");
+  if(o){ o.oninput = e=>{ S.tim=e.target.value;
+      if(["case","nhatky"].includes(S.man) || (S.man==="pnl"&&S.pnlTab==="sku")){
+        $("#body").innerHTML = veMan(); gan();
+        const n=$("#oTim"); if(n){} } };
+  }
+  const x = $("#btnXuat");
+  if(x) x.onclick = ()=>{ ghiNhatKy("Dũng","Xuất bảng kê", TIEUDE[S.man][0]+" · "+kh().ten);
+    toast("Đã xuất bảng kê "+TIEUDE[S.man][0].toLowerCase()); };
+}
+
+/* cập nhật khối kết quả mô phỏng mà không mất tiêu điểm thanh trượt */
+function capNhatSim(){
+  const wrap = document.querySelector(".sim"); if(!wrap) return;
+  const cur = {g:$("#rGiam")&&$("#rGiam").value, a:$("#rAds")&&$("#rAds").value, f:$("#rAff")&&$("#rAff").value, c:$("#rCo")&&$("#rCo").value};
+  wrap.outerHTML = dbMoPhong().match(/<div class="sim">[\s\S]*<\/div>\s*$/)[0];
+  gan();
+  if($("#rGiam")) $("#rGiam").value = cur.g;
+  if($("#rAds")) $("#rAds").value = cur.a;
+  if($("#rAff")) $("#rAff").value = cur.f;
+  if($("#rCo")) $("#rCo").value = cur.c;
+}
+
+/* phím tắt */
+document.addEventListener("keydown", e=>{
+  if(e.key==="/" && document.activeElement.tagName!=="INPUT"){ e.preventDefault(); const o=$("#oTim"); if(o) o.focus(); }
+  if(e.key==="Escape"){ const o=$("#oTim");
+    if(document.activeElement===o){ o.blur(); }
+    else if(S.caseId){ S.caseId=null; ve(); } }
+});
+
+ve();
+
+/* để kiểm thử tự động truy cập được trạng thái */
+if (typeof window !== "undefined") { window.S = S; window.PNL = PNL; window.SKU = SKU; window.TENANTS = TENANTS; window.NHOM = NHOM; window.PHI_KENH = PHI_KENH; }
+
+</script>
+</body>
+</html>
